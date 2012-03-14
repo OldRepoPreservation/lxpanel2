@@ -1,0 +1,17 @@
+This directory contains vapi files used for Vala binding of C libraries.
+
+libwnck-3.0.vapi was copied from vala git repository. When newer 
+versions of vala which have built-in wnck 3.0 support are widely 
+available, this file is no more needed.
+
+gtop-2.0.vapi was generated via the following command:
+vapigen --library gtop-2.0 /usr/share/gir-1.0/GTop-2.0.gir
+(on ubuntu, libgirepository1.0-dev needs to installed before doing this)
+
+GTop has weird and sparsely documented APIs. There are many variants
+of the same API with _s, _l, _r, and _p sufficies.
+I've no idea what the differences are. Just my guess, _l might stand
+for library, _r might stand for real, ...etc. Who knows?
+The ones with _p seem to be called from slave daemon process only.
+The most generic ones without any sufficies seem to work as expected
+so let's use them.

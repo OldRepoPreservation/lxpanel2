@@ -1,0 +1,10 @@
+NaTray* objects are taken from gnome-panel git (c1e7e41e3120f5ebe9a4a36ae9ef6697e8faca98).
+
+ * Copyright (C) 2002 Anders Carlsson <andersca@gnu.org>
+ * Copyright (C) 2003-2006 Vincent Untz
+ * Copyright (C) 2008 Red Hat, Inc.
+
+License: LGPL2
+
+For use in lxpanel, we did some trivial modifications to make it compilable without gnome.
+

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<lxpanel>
+	<global>
+		<file_manager>pcmanfm</file_manager>
+		<logout_command>lxde-logout</logout_command>
+	</global>
+	<panel id="top_panel">
+		<orientation>horizontal</orientation>
+		<position>top</position>
+		<icon_size>24</icon_size>
+		<size>26</size>
+		<auto_hide>false</auto_hide>
+		<reserve_space>true</reserve_space>
+		<applets>
+
+			<applet type="appmenu">
+				<!-- <image></image> -->
+				<show_label>false</show_label>
+			</applet>
+			
+			<applet type="places" />
+
+			<applet type="launchbar">
+				<button type="app">
+					<desktop_id>pcmanfm.desktop</desktop_id>
+				</button>
+				<button type="app">
+					<desktop_id>leafpad.desktop</desktop_id>
+				</button>
+				<button type="custom">
+					<command>google-chrome</command>
+					<icon>google-chrome</icon>
+					<terminal>false</terminal>
+					<label>Google Chrome</label>
+				</button>
+			</applet>
+
+			<applet type="netstatus">
+				<iface>eth0</iface>
+				<command>network-admin</command>
+			</applet>
+
+			<applet type="netstatus">
+				<iface>wlan0</iface>
+				<command>network-admin</command>
+			</applet>
+
+			<applet type="battery" />
+
+			<applet type="clock">
+				<format></format>
+				<tip_format>%c</tip_format>
+			</applet>
+
+			<applet type="logout">
+				<show_menu>false</show_menu>
+			</applet>
+
+			<applet type="systray" />
+
+		</applets>
+	</panel>
+	<panel id="bottom_panel">
+		<orientation>horizontal</orientation>
+		<position>bottom</position>
+		<icon_size>24</icon_size>
+		<size>26</size>
+		<auto_hide>false</auto_hide>
+		<reserve_space>true</reserve_space>
+		<applets>
+			<applet type="showdesktop" />
+
+			<applet type="pager">
+				<rows>2</rows>
+			</applet>
+
+			<applet type="tasklist">
+				<all_workspace>false</all_workspace>
+				<show_icon>true</show_icon>
+				<show_label>false</show_label>
+				<group_windows>false</group_windows>
+			</applet>
+		</applets>
+	</panel>
+</lxpanel>

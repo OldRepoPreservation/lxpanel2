@@ -1,0 +1,5 @@
+# files listed here will be processed by intltool to generate a pot file.
+src/lxpanel2.vala
+src/panel.vala
+[type: gettext/glade] data/ui/about.ui
+

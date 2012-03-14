@@ -1,0 +1,8 @@
+/* Gettext package. */
+#define ENABLE_NLS			1
+/* #define GETTEXT_PACKAGE		"${GETTEXT_PACKAGE}" */
+#define PACKAGE_LIB_DIR		"${CMAKE_INSTALL_PREFIX}/lib/lxpanel2"
+#define PACKAGE_DATA_DIR	"${CMAKE_INSTALL_PREFIX}/share/lxpanel2"
+#define PACKAGE_UI_DIR		"${CMAKE_INSTALL_PREFIX}/share/lxpanel2/ui"
+#define PACKAGE_LOCALE_DIR	"${CMAKE_INSTALL_PREFIX}/share/locale"
+#define VERSION				""
