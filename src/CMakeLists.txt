@@ -95,7 +95,7 @@ add_executable(lxpanel2
 # generate na-marshal.[ch]
 # FIXME: we should make this a cmake module for ease of reuse later
 add_custom_command(
-	OUTPUT applets/na-tray/na-marshal.h applets/na-tray/na-marshal.c
+	OUTPUT na-marshal.h na-marshal.c
 	DEPENDS applets/na-tray/na-marshal.list
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/applets/na-tray
 	COMMAND ${GLIB_GENMARSHAL} --header --prefix=_na_marshal na-marshal.list
