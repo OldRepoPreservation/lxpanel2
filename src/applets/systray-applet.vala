@@ -59,7 +59,6 @@ public class SysTrayApplet : Gtk.Frame, Applet {
 	}
 
     protected override void screen_changed(Gdk.Screen prev) {
-        base.screen_changed(prev);
         // NaTray is a per-screen object.
         // If screen is changed, though this is really really rare, we need to recreate it.
         if(tray != null) {
