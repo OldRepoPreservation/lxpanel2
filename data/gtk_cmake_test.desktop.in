@@ -1,5 +1,0 @@
-[Desktop Entry]
-Icon=applications-utility
-_Name=GTK+ CMake Test
-_Comment=Bulding GTK+ programs with CMake.
-Exec=gtk_cmake_test

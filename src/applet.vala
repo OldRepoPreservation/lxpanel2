@@ -50,7 +50,7 @@ public class AppletInfo {
         if(name != null)
             return;
         // load from applet definition file
-        string base_name = @"lxpanel2/applets/$type_name.applet";
+        string base_name = @"lxpanel2/applets/$type_name.desktop";
         var keyfile = new KeyFile();
         try {
             keyfile.load_from_data_dirs(base_name, null, 0);
