@@ -27,7 +27,7 @@ set(CMAKE_INSTALL_SYSCONFDIR "/etc" CACHE PATH "Location for system configuratio
 include(GNUInstallDirs)
 
 # use pkg-config to find gtk+ 3.0
-pkg_check_modules(GTK REQUIRED gtk+-3.0 glib-2.0 gio-2.0 gio-unix-2.0)
+pkg_check_modules(GTK REQUIRED gtk+-3.0 glib-2.0 gio-2.0 gio-unix-2.0 gthread-2.0)
 # find glib tools
 find_program(GLIB_GENMARSHAL
 	NAMES glib-genmarshal

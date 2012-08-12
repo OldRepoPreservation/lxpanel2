@@ -36,6 +36,15 @@ public class TaskAppButton : Button {
 	protected override void clicked() {
 		unowned List<weak Wnck.Window> windows = application.get_windows();
 		if(windows != null) {
+			var popup = new Popup();
+			var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+			popup.add(box);
+			foreach(var window in windows) {
+				var btn = new TaskButton(panel, window);
+				box.add(btn);
+			}
+			box.show_all();
+			popup.popup(get_menu_position, 1, Gtk.get_current_event_time());
 		}
 	}
 
@@ -148,7 +157,7 @@ public class TaskButton : Button {
 }
 
 
-public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
+public class TaskListApplet : Grid, Applet, Gtk.Orientable {
 
 	public TaskListApplet(Panel panel) {
 		this.panel = panel;
@@ -170,8 +179,8 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 
 	public override void dispose() {
 		if(screen != null) {
-			// screen.application_opened.disconnect(on_application_opened);
-			// screen.application_closed.disconnect(on_application_closed);
+			screen.application_opened.disconnect(on_application_opened);
+			screen.application_closed.disconnect(on_application_closed);
 			screen.class_group_opened.disconnect(on_class_group_opened);
 			screen.class_group_closed.disconnect(on_class_group_closed);
 			screen.window_opened.disconnect(on_window_opened);
@@ -188,8 +197,8 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 		screen = Wnck.Screen.get(get_screen().get_number());
 
 		if(screen != null) {
-			// screen.application_opened.connect(on_application_opened);
-			// screen.application_closed.connect(on_application_closed);
+			screen.application_opened.connect(on_application_opened);
+			screen.application_closed.connect(on_application_closed);
 			screen.class_group_opened.connect(on_class_group_opened);
 			screen.class_group_closed.connect(on_class_group_closed);
 			screen.window_opened.connect(on_window_opened);
@@ -203,15 +212,36 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 		}
 	}
 
-	/*
 	private void on_application_opened(Wnck.Screen screen, Wnck.Application application) {
+		if(group_windows == false)
+			return;
 		debug("app open: %s, %d", application.get_name(), application.get_n_windows());
+
+		var btn = new TaskAppButton(panel, application);
+
+		var label = (Gtk.Label)btn.get_child();
+		label.set_ellipsize(Pango.EllipsizeMode.END);
+		var attrs = panel.get_text_attrs();
+		if(attrs != null)
+			label.set_attributes(attrs);
+
+		btn.set_show_label(show_label);
+		btn.set_image_position(Gtk.PositionType.LEFT);
+		if(show_label == true)
+			btn.set_size_request(max_btn_size, -1);
+
+		add(btn);
+
+		var ws = screen.get_active_workspace();
+		// hash.insert(window, btn);
+		btn.set_visible(ws == null);
 	}
 
 	private void on_application_closed(Wnck.Screen screen, Wnck.Application application) {
+		if(group_windows == false)
+			return;
 		debug("app close: %s, %d", application.get_name(), application.get_n_windows());
 	}
-	*/
 
 	private void on_class_group_opened(Wnck.Screen screen, Wnck.ClassGroup group) {
 		debug("class group open: %s, %d", group.get_name(), (int)group.get_windows().length());
@@ -221,8 +251,12 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 		debug("class group close: %s, %d", group.get_name(), (int)group.get_windows().length());
 	}
 
-
 	private void on_window_opened(Wnck.Screen screen, Wnck.Window window) {
+		if(group_windows == true) {
+			// update the app button
+			return;
+		}
+
 		debug("win open: %s", window.get_name());
 		if(!window.is_skip_tasklist()) {
 			var btn = new TaskButton(panel, window);
@@ -289,54 +323,6 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 			base.get_preferred_width(out min_w, out natral_w);
 		}
 	}
-	
-	protected override void size_allocate(Gtk.Allocation allocation) {
-		set_allocation(allocation);
-		if(show_label) { // if we show labels, the applet needs to be expandable
-			// if the task list is expanded to fill all available spaces
-			if(children != null) {
-				// FIXME: handle vertical orientation
-				Gtk.Allocation child_allocation = {0};
-				int n_rows = int.max(1, allocation.height / btn_height);
-				int n_children = (int)children.length();
-				int n_cols = n_children / n_rows;
-				if(n_children % n_rows != 0)
-					++n_cols;
-				int btn_size = allocation.width / n_cols;
-				// btn_size.clamp(min_btn_size, max_btn_size);
-				btn_size = int.min(max_btn_size, btn_size);
-				child_allocation.x = allocation.x;
-				child_allocation.y = allocation.y;
-				child_allocation.width = btn_size;
-				child_allocation.height = btn_height;
-				int row = 1;
-				foreach(weak Gtk.Widget child in children) {
-					if(!child.get_visible())
-						continue;
-					child.size_allocate(child_allocation);
-					if(row < n_rows) {
-						child_allocation.y += btn_height;
-						++row;
-					}
-					else {
-						child_allocation.y = allocation.y;
-						row = 1;
-						child_allocation.x += btn_size;
-					}
-				}
-			}
-		}
-		else { // icon only
-			if(children != null) {
-				Gtk.Allocation child_allocation = allocation;
-				if(get_orientation() == Gtk.Orientation.HORIZONTAL) {
-				}
-				else { // vertical
-					// FIXME: implement this
-				}
-			}
-		}
-	}
 
 	public bool get_expand() {
 		return show_label;
@@ -380,44 +366,9 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 		}
 	}
 
-	public void insert_child(Gtk.Widget child, int index) {
-		children.insert(child, index);
-		child.set_parent(this);
-	}
-
-	// Gtk.Container
-	public override void add(Gtk.Widget child) {
-		insert_child(child, -1);
-	}
-	
-	public override void remove(Gtk.Widget child) {
-		unowned List<Gtk.Widget> link = children.find(child);
-		if(link != null) {
-			if(child.get_visible() && get_visible())
-				queue_resize();
-			children.delete_link(link);
-			child.unparent();
-		}
-	}
-
-	public override void forall(Gtk.Callback callback) {
-		foreach(weak Gtk.Widget child in children) {
-			callback(child);
-		}
-	}
-
-	public override void forall_internal(bool include_internal, Gtk.Callback callback) {
-		foreach(weak Gtk.Widget child in children) {
-			callback(child);
-		}
-	}
-
 	// Applet iface
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo get_info() {
+        AppletInfo applet_info = new AppletInfo();
 		applet_info.type_name = "tasklist";
 		applet_info.name= _("Task List");
 		applet_info.description= _("Task List");
@@ -426,9 +377,8 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 			var applet = new TaskListApplet(panel);
 			return applet;
 		};
-		Applet.register(ref applet_info);
+        return applet_info;
 	}
-	public static Applet.Info applet_info;
 
 	private int max_btn_size;
 	private int min_btn_size;
@@ -441,9 +391,6 @@ public class TaskListApplet : Gtk.Container, Applet, Gtk.Orientable {
 	private weak Wnck.Screen screen;
 	private HashTable<weak Wnck.Window, weak TaskButton> hash;
 	private weak Panel panel;
-
-	// for Gtk.Container child widgets
-	private List<Gtk.Widget> children;
 }
 
 }

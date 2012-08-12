@@ -21,41 +21,101 @@
 
 namespace Lxpanel {
 
-private HashTable<unowned string, Applet.Info*> applet_types;
+private HashTable<unowned string, AppletInfo> applet_types;
 private List<AppletModule> modules;
+private Quark applet_info_quark_id;
+
+[Compact]
+public class AppletInfo {
+    public int abi_version;
+    public Type type_id;
+    public string type_name;
+    public string? name;
+    public string? version;
+    public string? description;
+    public string[] authors;
+    public string? copyright;
+    public bool expandable;
+    public unowned AppletModule? module; // used by dynamic applets
+
+    public Applet? create_new() {
+        Applet applet = null;
+        print("type_id: %d\n", (int)type_id);
+        if(type_id != 0)
+            applet = (Applet)Object.new(type_id);
+        return applet;
+    }
+
+    public void load_deatils() {
+        if(name != null)
+            return;
+        // load from applet definition file
+        string base_name = @"lxpanel2/applets/$type_name.applet";
+        var keyfile = new KeyFile();
+        try {
+            keyfile.load_from_data_dirs(base_name, null, 0);
+            name = keyfile.get_locale_string("Applet", "Name");
+            version = keyfile.get_locale_string("Applet", "Version");
+            description = keyfile.get_locale_string("Applet", "Description");
+            authors = keyfile.get_locale_string_list("Applet", "Authors");
+            version = keyfile.get_locale_string("Applet", "Copyright");
+        }
+        catch(Error err) {
+        }
+    }
+}
+
 
 public interface Applet : Gtk.Widget {
-
-	[CCode (has_target = false)]
-	public delegate Applet CreateFunc(Panel panel);
-
-	public struct Info {
-		public int version;
-		public unowned string type_name;
-		public unowned string name;
-		public unowned string description;
-		public unowned string author;
-		public unowned string copyright;
-		public bool expandable;
-		// function used to create new instances of the applet
-		public CreateFunc create_applet;
-		public AppletModule? module; // used by dynamic applets
-	}
 
 	public virtual bool get_expand() {
 		return false;
 	}
+
 	public virtual void set_expand(bool expand) {
 	}
 
-	public abstract unowned Info? get_info();
+    public virtual void set_panel(Panel panel) {
+        set_panel_orientation(panel.orientation);
+        set_panel_position(panel.get_position());
+        set_icon_size(panel.get_icon_size());
+    }
 
-	public static Applet? new_from_type(Panel panel, string type_name) {
-		Info* info = applet_types.lookup(type_name);
+    public virtual void set_panel_orientation(Gtk.Orientation orientation) {
+    }
+
+	public virtual void set_panel_position(Gtk.PositionType pos) {
+	}
+
+	public virtual void set_icon_size(int size) {
+	}
+
+    public virtual unowned AppletInfo get_info() {
+        return get_qdata<AppletInfo>(applet_info_quark_id);
+    }
+
+	public static Applet? new_from_type_name(string type_name) {
+		unowned AppletInfo info = applet_types.lookup(type_name);
+        if(info == null) {
+            // try to load a dynamic module
+            var module = AppletModule.from_name(type_name);
+            if(module != null) {
+                // build AppletInfo from the module
+                var dynamic_info = module.build_applet_info();
+                if(dynamic_info != null) {
+                    info = dynamic_info;
+                    applet_types.insert(type_name, (owned)dynamic_info);
+                }
+            }
+        }
 		if(info != null) {
-			CreateFunc func = info->create_applet;
-			if(func != null)
-				return func(panel);
+            print("found applet: %s\n", info.type_name);
+            var applet = info.create_new();
+            print("applet created: %p\n", (void*)applet);
+            if(applet != null) {
+                applet.set_qdata_full(applet_info_quark_id, (void*)info, null);
+                return applet;
+            }
 		}
 		return null;
 	}
@@ -65,36 +125,6 @@ public interface Applet : Gtk.Widget {
 	}
 	
 	public virtual void save_config(GMarkupDom.Node config_node) {
-	}
-
-	public virtual void set_icon_size(int size) {
-	}
-
-	public virtual void set_position(Gtk.PositionType pos) {
-	}
-
-	public static void register(ref Info info) {
-		applet_types.insert(info.type_name, &info);
-	}
-
-	public static void unregister(ref Info info) {
-		applet_types.remove(info.type_name);
-	}
-
-	public List<Info?> get_all_types() {
-		register_modules();
-		return null;
-	}
-
-	private static void register_module(string name, string file) {
-		// make sure that it's not registered yet
-		if(applet_types.lookup(name) == null) {
-			var module = new AppletModule(name, file);
-			modules.prepend(module);
-			module.use();
-			Info* info = module.get_info();
-			applet_types.insert(info->name, info);
-		}
 	}
 
 	private static void register_modules_in_dir(string dirpath) {
@@ -108,7 +138,11 @@ public interface Applet : Gtk.Widget {
 				if(name.has_suffix(".so") && FileUtils.test(path, FileTest.IS_REGULAR)) {
 					// a module is found, register it
 					var type_name = name[0:-3];
-					register_module(type_name, path);
+					if(applet_types.lookup(type_name) == null) { // it's not yet added
+                        var module = new AppletModule(type_name, path);
+                        var info = module.build_applet_info();
+                        applet_types.insert(type_name, (owned)info);
+                    }
 				}
 			}
 		}
@@ -127,30 +161,56 @@ public interface Applet : Gtk.Widget {
 		register_modules_in_dir(dirpath);
 	}
 
-	public static void register_all() {
-		if(applet_types == null)
-			applet_types = new HashTable<unowned string, Info*>(str_hash, str_equal);
-
+    // register built-in applets
+	private static void register_builtin() {
 		// register all built-in applets
-		AppMenuApplet.register();
-		BlankApplet.register();
-		BatteryApplet.register();
-		ClockApplet.register();
-		LaunchbarApplet.register();
-		LogoutApplet.register();
-		NetstatusApplet.register();
-		PagerApplet.register();
-		PlacesApplet.register();
-		ShowDesktopApplet.register();
-		TaskListApplet.register();
-		SysTrayApplet.register();
-		
+        AppletInfo info = null;
+        info = AppMenuApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = BlankApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = BatteryApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = ClockApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = LaunchbarApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = LogoutApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = NetstatusApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = PagerApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = PlacesApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = ShowDesktopApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = WnckTaskListApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+
+        info = SysTrayApplet.build_info();
+        applet_types.insert(info.type_name, (owned)info);
+    }
+
+	public static void init() {
+        applet_types = new HashTable<unowned string, AppletInfo>(str_hash, str_equal);
+        applet_info_quark_id = Quark.from_string("applet-info");
+        register_builtin();
 		// we do not register dynamic applets in modules here
 		// for performance reasons.
 		// we will enumerate all available modules when needed.
-		register_modules();
+		// register_modules();
 	}
 }
-
 
 }

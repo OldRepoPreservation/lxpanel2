@@ -43,7 +43,7 @@ private class PowerDevice : Object {
 
 public class BatteryApplet : Gtk.Box, Applet {
 
-	public BatteryApplet(Panel panel) {
+	construct {
 		upower = Bus.get_proxy_sync(BusType.SYSTEM, 
 									"org.freedesktop.UPower",
 									"/org/freedesktop/UPower");
@@ -144,16 +144,18 @@ public class BatteryApplet : Gtk.Box, Applet {
 		cr.set_source_rgb(0,0,0);
 		cr.rectangle(1, 1, width, height);
 		cr.fill();
-		int left = 1;
-		int cell_width = width / (int)batteries.length();
-		cr.set_source_rgb(0,1,0);
-		foreach(unowned PowerDevice device in batteries) {
-			double percent = device.udevice.percentage;
-			double bar_height = height * percent / 100;
-			double bar_top = height - bar_height;
-			cr.rectangle(left + 1, 1 + bar_top + 1, cell_width - 2, bar_height - 2);
-			cr.fill();
-			left += cell_width;
+		if(batteries != null) {
+			int left = 1;
+			int cell_width = width / (int)batteries.length();
+			cr.set_source_rgb(0,1,0);
+			foreach(unowned PowerDevice device in batteries) {
+				double percent = device.udevice.percentage;
+				double bar_height = height * percent / 100;
+				double bar_top = height - bar_height;
+				cr.rectangle(left + 1, 1 + bar_top + 1, cell_width - 2, bar_height - 2);
+				cr.fill();
+				left += cell_width;
+			}
 		}
 		cr.restore();
 		return true;
@@ -176,23 +178,14 @@ public class BatteryApplet : Gtk.Box, Applet {
 		natral_width = min_width = (int)batteries.length() * cell_width;
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(BatteryApplet);
 		applet_info.type_name = "battery";
 		applet_info.name= _("Battery");
 		applet_info.description= _("Battery Monitor");
-		applet_info.author= _("Lxpanel");
-
-		applet_info.create_applet=(panel) => {
-			var applet = new BatteryApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
 
 	UPower.UPower upower;
 	List<PowerDevice> batteries;

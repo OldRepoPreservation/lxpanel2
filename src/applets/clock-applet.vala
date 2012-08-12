@@ -6,17 +6,9 @@ const string DEFAULT_CLOCK_FORMAT = "%R";
 
 public class ClockApplet : Gtk.Label, Applet {
 
-	public ClockApplet(Panel panel) {
+	construct {
 		timeout = Timeout.add(1000, on_timeout);
 		on_timeout();
-
-		// Gdk.RGBA color = {1, 0, 0, 1};
-		// override_color(Gtk.StateFlags.NORMAL, color);
-
-		// set text color/font
-		unowned Pango.AttrList attrs = panel.get_text_attrs();
-		if(attrs != null)
-			set_attributes(attrs);
 	}
 
 	protected override void dispose() {
@@ -34,22 +26,14 @@ public class ClockApplet : Gtk.Label, Applet {
 		return true;
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(ClockApplet);
 		applet_info.type_name = "clock";
 		applet_info.name= _("Clock");
 		applet_info.description= _("Clock");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new ClockApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info  applet_info;
 
 	private uint timeout;
 }

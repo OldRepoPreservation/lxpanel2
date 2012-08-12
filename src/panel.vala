@@ -28,10 +28,9 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		order = 0;
 		size = 26;
 		expand = false;
-		background_mode = BackgroundMode.SYSTEM;
 
 		set_border_width(1);
-		set_app_paintable(true);
+		// set_app_paintable(true);
 		set_decorated(false);
 		set_deletable(false);
 		set_keep_above(true);
@@ -87,6 +86,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	}
 
 	protected override bool draw(Cairo.Context cr) {
+        /*
 		var sc = get_style_context();
 		cr.save();
 
@@ -105,16 +105,18 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		}
 
 		cr.restore();
+        */
 		return base.draw(cr);
 	}
 
 	private bool load_applet(GMarkupDom.Node node) {
 		var applet_type = node.get_attribute("type");
-		var applet = Applet.new_from_type(this, applet_type);
-		// stdout.printf("applet: %s, %p\n", applet_type, applet);
+		var applet = Applet.new_from_type_name(applet_type);
+		// print("applet: %s, %p\n", applet_type, applet);
 		if(applet != null) {
 			if(applet.load_config(node)) {
 				box.pack_start(applet, applet.get_expand(), true);
+                applet.set_panel(this);
 				applet.show();
 			}
 		}
@@ -141,16 +143,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 			else if(child.name == "position") {
 				// position = (Gtk.PositionType)int.parse(child.val);
 				position = enum_nick_parse<Gtk.PositionType>(child.val);
-			}
-			else if(child.name == "background_mode") {
-				background_mode = enum_nick_parse<BackgroundMode>(child.val);
-			}
-			else if(child.name == "background_image") {
-				background_image_file = (owned)child.val;
-				// load background image file if it's set
-				if(background_image_file != null) {
-					background_pixbuf = new Gdk.Pixbuf.from_file(background_image_file);
-				}
 			}
 			else if(child.name == "reserve_space") {
 				reserve_space = bool.parse(child.val);
@@ -198,8 +190,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	public bool save_panel(GMarkupDom.Node node) {
 		node.new_child("orientation", enum_to_nick<Gtk.Orientation>(_orientation));
 		node.new_child("position", enum_to_nick<Gtk.PositionType>(position));
-		node.new_child("background_mode", enum_to_nick<BackgroundMode>(background_mode));
-		node.new_child("background_image", background_image_file);
 		node.new_child("reserve_space", reserve_space.to_string());
 		node.new_child("auto_hide", auto_hide.to_string());
 		node.new_child("expand", expand.to_string());
@@ -207,7 +197,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		node.new_child("size", size.to_string());
 		unowned GMarkupDom.Node applets = node.new_child("applets");
 		foreach(unowned Applet applet in get_applets()) {
-			Applet.Info info = applet.get_info();
+			unowned AppletInfo info = applet.get_info();
 			unowned GMarkupDom.Node applet_node;
 			applet_node = applets.new_child("applet", null, {"type"}, {info.type_name});
 			applet.save_config(applet_node);
@@ -305,7 +295,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
 				Gdk.property_change(get_window(), _NET_WM_STRUT_PARTIAL,
 					Gdk.Atom.intern_static_string("CARDINAL"), 32,
-					Gdk.PropMode.REPLACE, (uchar[])struct_data, 12);
+					Gdk.PropMode.REPLACE, (uchar[])struct_data);
 			}
 			else {
 				Gdk.property_delete(get_window(), _NET_WM_STRUT_PARTIAL);
@@ -324,6 +314,37 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		}
 	}
 
+    public Gtk.PositionType get_position() {
+        return position;
+    }
+    
+    public void set_position(Gtk.PositionType position) {
+        this.position = position;
+        // TODO: call set_position() on all applets
+        // reposition the panel
+    }
+
+    private static void load_theme() {
+/*
+        var provider = new Gtk.CssProvider();
+        string css = """
+            LxpanelPanel {
+            background-color: #000000;
+            color: #ffffff;
+            background-image: url('/usr/share/lxpanel/images/background.png');
+            }
+
+            #tasklist-button {
+                background-color: red;
+                color: #ffffff;
+            }
+        """;
+        provider.load_from_data(css, -1);
+        var screen = Gdk.Screen.get_default();
+        Gtk.StyleContext.add_provider_for_screen(screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+*/
+    }
+
 	// global settings apply to all panels
 	private static bool load_global(GMarkupDom.Node node) {
 		foreach(unowned GMarkupDom.Node child in node.children) {
@@ -331,12 +352,14 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 				file_manager = child.val;
 			else if(child.name == "logout_command")
 				logout_command = child.val;
+			else if(child.name == "theme")
+				theme_name = child.val;
 		}
 		return true;
 	}
 
 	public static bool load_all_panels(string profile_name) {
-
+load_theme();
 		var loaded = false;
 		var doc = new GMarkupDom.Doc();
 		// try to load user-specific config file first
@@ -384,6 +407,8 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 			global_node.new_child("file_manager", file_manager);
 		if(logout_command != null)
 			global_node.new_child("logout_command", logout_command);
+		if(theme_name != null)
+			global_node.new_child("theme", theme_name);
 
 		// save panels
 		foreach(weak Panel panel in all_panels) {
@@ -398,6 +423,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 			var fpath = Path.build_filename(dirpath, "config.xml", null);
 			return doc.save(fpath);
 		}
+
 		return false;
 	}
 
@@ -417,10 +443,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		foreach(weak Applet applet in get_applets()) {
 			applet.set_icon_size(size);
 		}
-	}
-
-	public unowned Gdk.Pixbuf? get_background_pixbuf() {
-		return background_pixbuf;
 	}
 
 	public unowned string? get_text_color() {
@@ -448,9 +470,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	private Gtk.PositionType position; // left, top, right, bottom
 	private int order; // order in panels of the same position
 	private string? monitor_name; // monitor to show the panel
-	private BackgroundMode background_mode; // mode of background
-	private string? background_image_file; // path to background image file
-	private Gdk.Pixbuf? background_pixbuf; // image for background
 	private string? text_color; // text color
 	private string? font_desc; // font used for text display
 	private Pango.AttrList? text_attrs; // pango attribute used to draw text (generated from text_color & font_desc), can be null
@@ -463,6 +482,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	private Gtk.Box box; // top box used to group applets
 	private static string? file_manager; // command used to launch file manager
 	private static string? logout_command; // command used to logout desktop session
+    private static string? theme_name; // name of the theme used
 	public static List<Panel> all_panels;
 }
 

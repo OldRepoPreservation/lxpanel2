@@ -23,36 +23,29 @@ namespace Lxpanel {
 
 class LogoutApplet : Button, Applet {
 
-	public LogoutApplet(Panel panel) { // FIXME: avoid this kind of weird gobject constructor
-		this.panel = panel;
+	construct {
 		set_tooltip_text(_("Logout"));
-		set_gicon(new ThemedIcon("system-log-out"), panel.get_icon_size());
 		show_all();
 	}
-
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
+    
+    protected void set_icon_size(int size) {
+		set_gicon(new ThemedIcon("system-log-out"), size);
+    }
 
 	protected override void clicked() {
-		unowned string? command = panel.get_logout_command();
+		unowned string? command = Panel.get_logout_command();
 		if(command != null)
 			Process.spawn_command_line_async(command);
 	}
 
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(LogoutApplet);
 		applet_info.type_name = "logout";
 		applet_info.name= _("Logout Button");
 		applet_info.description= _("Logout Button");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new LogoutApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
-	weak Panel panel;
 }
 
 }

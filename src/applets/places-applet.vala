@@ -23,9 +23,12 @@ namespace Lxpanel {
 
 public class PlacesApplet : Drawer, Applet {
 
-	public PlacesApplet(Panel panel) {
-		set_gicon(new ThemedIcon("user-home"), panel.get_icon_size());
+	construct {
 	}
+
+    protected void set_icon_size(int size) {
+		set_gicon(new ThemedIcon("user-home"), size);
+    }
 
 	public bool get_expand() {
 		return expand;
@@ -44,22 +47,14 @@ public class PlacesApplet : Drawer, Applet {
 	public void save_config(GMarkupDom.Node config_node) {
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(PlacesApplet);
 		applet_info.type_name = "places";
 		applet_info.name= _("Places");
 		applet_info.description= _("Places");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new PlacesApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return applet_info;
 	}
-	public static Applet.Info applet_info;
 
 	bool expand;
 }

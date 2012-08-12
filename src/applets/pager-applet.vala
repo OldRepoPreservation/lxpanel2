@@ -23,21 +23,28 @@ namespace Lxpanel {
 
 public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 
-	public PagerApplet(Panel panel) {
-		this.panel = panel;
-		var icon_size = panel.get_icon_size();
-		set_size_request(icon_size, icon_size);
+	construct {
+        icon_size = 20;
 		n_rows = 1;
 		set_n_rows(1);
-		_orientation = panel.orientation;
-		set_orientation(_orientation);
 		set_shadow_type(Gtk.ShadowType.NONE);
 	}
+
+    protected void set_panel_orientation(Gtk.Orientation orient) {
+        _orientation = orient;
+		set_orientation(_orientation);
+    }
+
+    protected void set_icon_size(int size) {
+        // FIXME: is this correct?
+        icon_size = size;
+		set_size_request(size, size);
+    }
 
 	public override void get_preferred_height(out int min_h, out int natral_h) {
 		if(orientation == Gtk.Orientation.HORIZONTAL) {
 			min_h = 1;
-			natral_h = panel.get_icon_size();
+			natral_h = icon_size;
 		}
 		else {
 			base.get_preferred_width(out min_h, out natral_h);
@@ -48,7 +55,7 @@ public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 	public override void get_preferred_width(out int min_w, out int natral_w) {
 		if(orientation == Gtk.Orientation.VERTICAL) {
 			min_w = 1;
-			natral_w = panel.get_icon_size();
+			natral_w = icon_size;
 		}
 		else {
 			base.get_preferred_width(out min_w, out natral_w);
@@ -82,26 +89,18 @@ public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 			config_node.new_child("rows", n_rows.to_string());
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(PagerApplet);
 		applet_info.type_name = "pager";
 		applet_info.name= _("Pager");
 		applet_info.description= _("Pager");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new PagerApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return applet_info;
 	}
-	public static Applet.Info applet_info;
 
-	weak Panel panel;
 	Gtk.Orientation _orientation;
 	int n_rows;
+    int icon_size;
 }
 
 }

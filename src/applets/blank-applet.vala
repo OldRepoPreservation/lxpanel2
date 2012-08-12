@@ -23,7 +23,7 @@ namespace Lxpanel {
 
 public class BlankApplet : Gtk.Box, Applet {
 
-	public BlankApplet() {
+	construct {
 	}
 
 	public bool get_expand() {
@@ -67,24 +67,16 @@ public class BlankApplet : Gtk.Box, Applet {
 			base.get_preferred_height(out min, out natral);
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(BlankApplet);
 		applet_info.type_name = "blank";
 		applet_info.name= _("Blank");
 		applet_info.description= _("Blank space");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new BlankApplet();
-			return applet;
-		};
-		Applet.register(ref applet_info);
+		return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
 
-	bool expand;
+    bool expand;
 	int size;
 }
 

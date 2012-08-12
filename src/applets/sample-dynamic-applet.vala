@@ -1,6 +1,6 @@
 //      sample-dynamic-applet.vala
 //      
-//      Copyright 2011 Hong Jen Yee (PCMan) <pcman.tw@gmail.com>
+//      Copyright 2012 Hong Jen Yee (PCMan) <pcman.tw@gmail.com>
 //      
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -22,47 +22,22 @@
 namespace Lxpanel {
 
 public class SampleDynamicApplet : Gtk.Box, Applet {
-	public SampleDynamicApplet(Panel panel) {
-		this.panel = panel;
+	construct {
 		var label = new Gtk.Label("Test");
-		label.set_attributes(panel.get_text_attrs());
 		label.show();
 		add(label);
 	}
-
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register(ref Applet.Info info) {
-		info.type_name = "sample";
-		info.name= _("sample");
-		info.description= _("sample for dynamic applets");
-		info.author= _("Lxpanel");
-
-		info.create_applet=(panel) => {
-			debug("creator called");
-			var applet = new SampleDynamicApplet(panel);
-			debug("creator returned");
-			return applet;
-		};
-		applet_info = info;
-		debug("the module is registered");
-	}
-
-	public static unowned Applet.Info? applet_info;
-	weak Panel panel;
 }
 
 }
 
 // called by lxpanel when loading the module
 [ModuleInit]
-public bool load(GLib.TypeModule module, ref Lxpanel.Applet.Info info) {
+public Type load(GLib.TypeModule module) {
 	// FIXME: ABI compatibility check here
-	Lxpanel.SampleDynamicApplet.register(ref info);
+	// Lxpanel.SampleDynamicApplet.register(ref info);
 	debug("the module is loaded");
-	return true;
+	return typeof(Lxpanel.SampleDynamicApplet);
 }
 
 // called by lxpanel before unloading the module

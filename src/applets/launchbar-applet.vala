@@ -68,9 +68,6 @@ public class LaunchButton : Button {
 
 public class LaunchbarApplet : Gtk.Box, Applet {
 
-	public LaunchbarApplet() {
-	}
-
 	construct {
 		set("orientation", Gtk.Orientation.HORIZONTAL, null);
 	}
@@ -159,23 +156,15 @@ public class LaunchbarApplet : Gtk.Box, Applet {
 		}
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(LaunchbarApplet);
 		applet_info.type_name = "launchbar";
 		applet_info.name= _("Launch bar");
 		applet_info.description= _("Launch bar");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new LaunchbarApplet();
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return applet_info;
 	}
 
-	public static Applet.Info applet_info;
 }
 
 }

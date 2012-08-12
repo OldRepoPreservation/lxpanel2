@@ -24,9 +24,12 @@ namespace Lxpanel {
 public class ShowDesktopApplet : Button, Applet {
 
 	construct {
-		set_gicon(new ThemedIcon("user-desktop"), 20);
 		set_tooltip_text(_("Show Desktop"));
 	}
+
+    protected void set_icon_size(int size) {
+		set_gicon(new ThemedIcon("user-desktop"), size);
+    }
 
 	protected override void clicked() {
 		var n = get_screen().get_number();
@@ -41,22 +44,14 @@ public class ShowDesktopApplet : Button, Applet {
 		return Gtk.SizeRequestMode.CONSTANT_SIZE;
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(ShowDesktopApplet);
 		applet_info.type_name = "showdesktop";
 		applet_info.name= _("Show Desktop");
 		applet_info.description= _("Show Desktop");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new ShowDesktopApplet();
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
 
 }
 

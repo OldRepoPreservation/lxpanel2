@@ -23,7 +23,7 @@ namespace Lxpanel {
 
 public class AppMenuApplet : MenuButton, Applet {
 
-	public AppMenuApplet(Panel panel) {
+	construct {
 		set_tooltip_text(_("Applications"));
 		set_icon_pixbuf(new Gdk.Pixbuf.from_file("/usr/share/lubuntu/images/lubuntu-logo.png"));
 
@@ -88,21 +88,14 @@ public class AppMenuApplet : MenuButton, Applet {
 		add_menu_items(menu, dir);
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(AppMenuApplet);
 		applet_info.type_name = "appmenu";
 		applet_info.name= _("AppMenu");
 		applet_info.description= _("Application Menu");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			return new AppMenuApplet(panel);
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
 
 	private MenuCache.Cache? menu_cache;
 	private void* menu_cache_reload_notify;

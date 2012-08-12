@@ -21,36 +21,68 @@
 
 namespace Lxpanel {
 
-public class SysTrayApplet : Na.Tray, Applet {
-	public SysTrayApplet(Panel panel) {
-		// NaTray does not have a public constructor
-		Object( // set construct properties
-			screen: panel.get_screen(),
-			orientation: panel.get_orientation());
-		base.set_icon_size(panel.get_icon_size());
-		set_padding(1);
+public class SysTrayApplet : Gtk.Frame, Applet {
+
+	construct {
+        set_shadow_type(Gtk.ShadowType.NONE);
+	}
+
+    protected void set_panel(Panel panel) {
+        if(tray == null) {
+            tray = new Na.Tray.for_screen(panel.get_screen(), panel.orientation);
+            tray.set_padding(1);
+            tray.show();
+            add(tray);
+        }
+    }
+
+    protected void set_panel_orientation(Gtk.Orientation orient) {
+        orientation = orient;
+    }
+
+	// for Gtk.Orientable iface
+	public Gtk.Orientation orientation {
+		get {	return _orientation;	}
+		set {
+			if(_orientation != value) {
+				_orientation = value;
+                if(tray != null)
+                    tray.set_orientation(value);
+			}
+		}
 	}
 
 	public new void set_icon_size(int size) {
-		base.set_icon_size(size);
+        if(tray != null) {
+            tray.set_icon_size(size);
+        }
 	}
 
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
+    protected override void screen_changed(Gdk.Screen prev) {
+        base.screen_changed(prev);
+        // NaTray is a per-screen object.
+        // If screen is changed, though this is really really rare, we need to recreate it.
+        if(tray != null) {
+            tray.destroy();
+            tray = null;
+        }
+        tray = new Na.Tray.for_screen(get_screen(), _orientation);
+        tray.set_padding(1);
+        tray.show();
+        add(tray);
+    }
 
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(SysTrayApplet);
 		applet_info.type_name = "systray";
 		applet_info.name= _("System Tray");
 		applet_info.description= _("System Tray");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new SysTrayApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
+
+    Na.Tray? tray;
+    Gtk.Orientation _orientation;
 }
 
 }

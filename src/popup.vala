@@ -99,12 +99,7 @@ public class Popup : Gtk.Window {
 		if(device == null) {
 			Gdk.Display display = get_display();
 			Gdk.DeviceManager device_manager = display.get_device_manager();
-
-			// FIXME: vapi for gdk-3.0 incorrectly marks this returned list as unowned.
-			// Actually, it's a newly allocated list which nees to be freed.
-			// This caused a memory leak here.
-			// We have to file a bug report in vala for this.
-			unowned List<weak Gdk.Device> devices = device_manager.list_devices(Gdk.DeviceType.MASTER);
+			List<weak Gdk.Device> devices = device_manager.list_devices(Gdk.DeviceType.MASTER);
 			device = devices.data;
 		}
 		popup_for_device(device, func, button, activate_time);

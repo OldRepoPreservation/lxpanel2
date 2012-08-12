@@ -70,12 +70,20 @@ private void init_dbus() {
 		() => stderr.printf ("Could not aquire name\n"));
 }
 
+static void init_unix_signals() {
+    Unix.signal_add(Posix.SIGTERM, () => {
+        Gtk.main_quit();
+        return false;
+    });
+}
+
 public int main(string[] args) {
 	// var app = new Gtk.Application("org.lxde.Lxpanel", 0);
 	Gtk.init_with_args(ref args, _("- lightweight desktop panel"), option_entries, Config.GETTEXT_PACKAGE);
 	// var screen = Wnck.Screen.get_default();
 	init_dbus();
-	Applet.register_all();
+    init_unix_signals();
+	Applet.init(); // initialize applets
 
 	if(profile_name == null)
 		profile_name = "default";
@@ -87,7 +95,7 @@ public int main(string[] args) {
 	// app.run();
 	
 	// this should be called by config dialog.
-	// Panel.save_all_panels(profile_name);
+	Panel.save_all_panels(profile_name);
 	return 0;
 }
 

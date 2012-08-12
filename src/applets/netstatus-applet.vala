@@ -23,17 +23,19 @@ namespace Lxpanel {
 
 public class NetstatusApplet : Gtk.EventBox, Applet {
 
-	public NetstatusApplet(Panel panel) {
-		this.panel = panel;
+	construct {
 		set_visible_window(false);
 		image = new Gtk.Image.from_gicon(icon_idle, Gtk.IconSize.MENU);
-		// Setting "pixel-size" property of Gtk.Image can override size
-		// determined by Gtk.IconSize.
-		image.pixel_size = panel.get_icon_size();
 
 		add(image);
 		show_all();
 	}
+
+    public void set_icon_size(int size) {
+		// Setting "pixel-size" property of Gtk.Image can override size
+		// determined by Gtk.IconSize.
+		image.pixel_size = size;
+    }
 
 	static construct {
 		const string icon_error_names[] = {"network-error", "gnome-netstatus-error"};
@@ -116,26 +118,14 @@ public class NetstatusApplet : Gtk.EventBox, Applet {
 		return true;
 	}
 
-	public void set_icon_size(int size) {
-		image.pixel_size = size;
-	}
-
-	public unowned Applet.Info? get_info() {
-		return applet_info;
-	}
-
-	public static void register() {
+	public static AppletInfo build_info() {
+        AppletInfo applet_info = new AppletInfo();
+        applet_info.type_id = typeof(NetstatusApplet);
 		applet_info.type_name = "netstatus";
 		applet_info.name= _("Net Status");
 		applet_info.description= _("Net Status");
-		applet_info.author= _("Lxpanel");
-		applet_info.create_applet=(panel) => {
-			var applet = new NetstatusApplet(panel);
-			return applet;
-		};
-		Applet.register(ref applet_info);
+        return (owned)applet_info;
 	}
-	public static Applet.Info applet_info;
 
 	uint timeout_id = 0;
 	string iface = "eth0"; // network interface
@@ -144,8 +134,6 @@ public class NetstatusApplet : Gtk.EventBox, Applet {
 	uint64 last_rx;
 	uint64 last_tx;
 	
-	weak Panel panel;
-
 	static GLib.Icon icon_error;
 	static GLib.Icon icon_idle;
 	static GLib.Icon icon_offline;

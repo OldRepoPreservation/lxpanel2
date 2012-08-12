@@ -33,6 +33,7 @@ vala_precompile(VALA_C
 	menu-button.vala
 	drawer.vala
 	popup.vala
+	# grid.vala
 	upower.vala
 	gmarkup-dom.vala
 	utils.vala
@@ -47,7 +48,8 @@ vala_precompile(VALA_C
 	applets/netstatus-applet.vala
 	applets/pager-applet.vala
 	applets/show-desktop-applet.vala
-	applets/task-list-applet.vala
+	# applets/task-list-applet.vala
+    applets/wnck-task-list-applet.vala
 	applets/systray-applet.vala
 	applets/places-applet.vala
 PACKAGES

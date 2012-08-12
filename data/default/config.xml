@@ -74,7 +74,7 @@
 				<rows>2</rows>
 			</applet>
 
-			<applet type="tasklist">
+			<applet type="wncktasklist">
 				<all_workspace>false</all_workspace>
 				<show_icon>true</show_icon>
 				<show_label>false</show_label>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-04 22:39+0800\n"
+"POT-Creation-Date: 2012-08-12 17:09+0800\n"
 "PO-Revision-Date: 2011-12-03 09:30+0800\n"
 "Last-Translator: Hong Jen Yee (PCMan) <pcman.tw@gmail.com>\n"
 "Language-Team: zh_TW <pcman.tw@gmail.com>\n"
@@ -23,14 +23,14 @@ msgid "profile name"
 msgstr ""
 
 #. var app = new Gtk.Application("org.lxde.Lxpanel", 0);
-#: ../src/lxpanel2.vala:75
+#: ../src/lxpanel2.vala:82
 msgid "- lightweight desktop panel"
 msgstr ""
 
 #: ../data/ui/about.ui.h:1
-msgid "Building GTK+ programs with CMake.\t"
+msgid "Copyright (C) 2011 by PCMan"
 msgstr ""
 
 #: ../data/ui/about.ui.h:2
-msgid "Copyright (C) 2011 by PCMan"
+msgid "Building GTK+ programs with CMake.\t"
 msgstr ""

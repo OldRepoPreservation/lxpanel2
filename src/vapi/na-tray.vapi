@@ -11,8 +11,8 @@ namespace Na {
 		public void set_colors(Gdk.Color fg, Gdk.Color error, Gdk.Color warning, Gdk.Color success);
 		public void force_redraw();
 		
-		public Gdk.Screen screen {get;set;}
-		public Gtk.Orientation orientation {get;set;}
+		public Gdk.Screen screen {get;set construct;}
+		public Gtk.Orientation orientation {get;set construct;}
 	}
 
 }
