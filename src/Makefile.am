@@ -88,6 +88,7 @@ BUILTIN_APPLETS_SOURCES = \
 	$(NATRAY_SOURCES) \
 	applets/systray-applet.vala \
 	applets/places-applet.vala \
+	applets/mounts-applet.vala \
 	$(NULL)
 
 lxpanel2_SOURCES = \
@@ -138,6 +139,7 @@ lxpanel2_LDADD = \
 
 # FIXME: using -export-dynamic to do back-linking is not portable.
 # It's better to move core lxpanel2 APIs in a separate lib.
+# See http://sources.redhat.com/autobook/autobook/autobook_172.html#SEC172
 lxpanel2_LDFLAGS = \
 	-export-dynamic \
 	$(NULL)

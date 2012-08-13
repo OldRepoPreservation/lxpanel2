@@ -94,4 +94,13 @@ public Gdk.Pixbuf? spotlight_pixbuf(Gdk.Pixbuf pix) {
 	return ret;
 }
 
+public void launch_folder(File path, Gdk.Screen? screen) {
+    if(screen == null)
+        screen = Gdk.Screen.get_default();
+    var ctx = new Gdk.AppLaunchContext();
+    ctx.set_screen(screen);
+    // FIXME: use the file manager specified in lxpanel config file.
+    AppInfo.launch_default_for_uri(path.get_uri(), null);
+}
+
 }
