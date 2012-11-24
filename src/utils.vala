@@ -103,4 +103,20 @@ public void launch_folder(File path, Gdk.Screen? screen) {
     AppInfo.launch_default_for_uri(path.get_uri(), null);
 }
 
+string locate_theme_dir(string theme_name) {
+    // search for the user specific themes first
+    var theme_dir = Path.build_filename(Environment.get_home_dir(), ".theme", theme_name, "lxpanel", null);
+    if(FileUtils.test(theme_dir + "/lxpanel.css", FileTest.IS_REGULAR))
+        return theme_dir;
+
+    // try system-wide theme dirs
+    var data_dirs = Environment.get_system_data_dirs();
+    foreach(unowned string data_dir in data_dirs) {
+        theme_dir = Path.build_filename(data_dir, "themes", theme_name, "lxpanel", null);
+        if(FileUtils.test(theme_dir + "/lxpanel.css", FileTest.IS_REGULAR))
+            return theme_dir;
+    }
+    return null;
+}
+
 }

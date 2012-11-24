@@ -273,7 +273,12 @@ public class Button : Gtk.Button, Gtk.Orientable {
 	}
 
 	// used to position a popup menu
-	protected void get_menu_position(Gtk.Widget menu, out int x, out int y, out bool push_in) {
+	protected void get_menu_position(Gtk.Menu menu, out int x, out int y, out bool push_in) {
+        get_popup_position(menu, out x, out y, out push_in);
+    }
+
+	// used to position a popup menu or window
+	protected void get_popup_position(Gtk.Widget menu, out int x, out int y, out bool push_in) {
 		if(get_realized()) {
 			int ox, oy, w, h;
 			get_window().get_origin(out ox, out oy);
@@ -305,7 +310,7 @@ public class Button : Gtk.Button, Gtk.Orientable {
 					y = oy + allocation.height - h;
 			}
 		}
-		push_in = true;
+		push_in = false;
 	}
 
 	// for Gtk.Orientable iface

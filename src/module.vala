@@ -8,6 +8,10 @@ public class AppletModule : TypeModule {
 	public AppletModule(string name, string file) {
 		this.name = name;
 		this.file = file;
+
+        // GTypeModule cannot be freed, so let's add a reference for it.
+        // See: http://www.lanedo.com/~mitch/module-system-talk-guadec-2006/Module-System-Talk-Guadec-2006.pdf
+        all_modules.prepend(this);
 	}
 
     public static AppletModule? from_name(string name) {
@@ -83,6 +87,7 @@ public class AppletModule : TypeModule {
 	string? file;
 	Module? module;
     Type type_id;
+    static SList<AppletModule> all_modules;
 }
 
 }

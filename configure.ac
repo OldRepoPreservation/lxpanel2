@@ -59,6 +59,12 @@ PKG_CHECK_MODULES(MENU_CACHE, [$menu_modules])
 AC_SUBST(MENU_CACHE_CFLAGS)
 AC_SUBST(MENU_CACHE_LIBS)
 
+libfm_modules="libfm >= 1.0 libfm-gtk >= 1.0"
+PKG_CHECK_MODULES(LIBFM, [$libfm_modules])
+AC_SUBST(LIBFM_CFLAGS)
+AC_SUBST(LIBFM_LIBS)
+
+
 
 ###########################
 # Indicator Info

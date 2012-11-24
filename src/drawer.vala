@@ -33,7 +33,7 @@ public class Drawer : Button {
 
 	protected override void clicked() {
 		if(popup != null) {
-			popup.popup(get_menu_position, 1, Gtk.get_current_event_time());
+			popup.popup(get_popup_position, 1, Gtk.get_current_event_time());
 		}
 	}
 

@@ -61,6 +61,7 @@ CORE_SOURCES = \
 	upower.vala \
 	gmarkup-dom.vala \
 	utils.vala \
+	xutils.vala \
 	module.vala \
 	$(LIBEGG_SOURCES) \
 	$(NULL)
@@ -123,6 +124,7 @@ lxpanel2_CFLAGS = \
 	$(GTOP_CFLAGS) \
 	$(MENU_CACHE_CFLAGS) \
 	$(X11_CFLAGS) \
+	$(LIBFM_CFLAGS) \
 	-Werror-implicit-function-declaration \
 	$(ADDITIONAL_FLAGS) \
 	$(NULL)
@@ -134,6 +136,7 @@ lxpanel2_LDADD = \
 	$(GTOP_LIBS) \
 	$(MENU_CACHE_LIBS) \
 	$(X11_LIBS) \
+	$(LIBFM_LIBS) \
 	$(INTLLIBS) \
 	$(NULL)
 

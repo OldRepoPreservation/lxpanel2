@@ -78,6 +78,12 @@ static void init_unix_signals() {
 }
 
 public int main(string[] args) {
+
+    /*
+    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+    textdomain (GETTEXT_PACKAGE);
+    */
 	// var app = new Gtk.Application("org.lxde.Lxpanel", 0);
 	Gtk.init_with_args(ref args, _("- lightweight desktop panel"), option_entries, Config.GETTEXT_PACKAGE);
 	// var screen = Wnck.Screen.get_default();
@@ -88,6 +94,7 @@ public int main(string[] args) {
 	if(profile_name == null)
 		profile_name = "default";
 
+    // PanelManager.init();
 	if(Panel.load_all_panels(profile_name) == false)
 		return 1;
 

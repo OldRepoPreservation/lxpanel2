@@ -67,6 +67,13 @@ public class AppletInfo {
 
 public interface Applet : Gtk.Widget {
 
+    public unowned Panel? get_panel() {
+        var box = get_parent();
+        if(box != null)
+            return (Panel)box.get_parent();
+        return null;
+    }
+
     public virtual bool get_expand() {
         return false;
     }
@@ -103,7 +110,7 @@ public interface Applet : Gtk.Widget {
                 var dynamic_info = module.build_applet_info();
                 if(dynamic_info != null) {
                     info = dynamic_info;
-                    applet_types.insert(type_name, (owned)dynamic_info);
+                    applet_types.insert(dynamic_info.type_name, (owned)dynamic_info);
                 }
             }
         }

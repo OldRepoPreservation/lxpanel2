@@ -27,6 +27,7 @@ public class WnckTaskListApplet : Wnck.Tasklist, Applet {
 
     construct {
         set_button_relief(Gtk.ReliefStyle.NONE);
+        set_grouping(Wnck.TasklistGroupingType.AUTO_GROUP);
     }
 	public bool get_expand() {
 		return expand;
@@ -34,6 +35,8 @@ public class WnckTaskListApplet : Wnck.Tasklist, Applet {
 
 	public void set_expand(bool expand) {
 		this.expand = expand;
+        if(expand == true) {
+        }
 	}
 
 	public bool load_config(GMarkupDom.Node config_node) {
@@ -49,6 +52,29 @@ public class WnckTaskListApplet : Wnck.Tasklist, Applet {
 		if(expand == true)
 			config_node.new_child("expand", expand.to_string());
 	}
+
+    protected override void get_preferred_width(out int min, out int natural) {
+        // NOTE:
+        // WnckTaskList calls size_request() in get_preferred_width() and
+        // get_preferred_height() internally and re-layout the widget
+        // within size_request(). So its height changes after
+        // get_preferred_width() is called, and width may change after
+        // get_preferred_height() is called. This behavior is really bad.
+        // if we don't chain up to base class here, layout of the task bar
+        // can be incorrect. However, I noticed that we need to override
+        // WnckTaskList and return very small values here. Otherwise,
+        // its tasklist will becomes very large, and go outside the screen.
+        base.get_preferred_width(out min, out natural);
+        // NOTE: we tried to set the preferred size as small as possible
+        // to overcome problems of libwnck.
+        min = natural = 2;
+    }
+
+    protected override void get_preferred_height(out int min, out int natural) {
+        // See the comment in get_preferred_width().
+        base.get_preferred_width(out min, out natural);
+        min = natural = 2;
+    }
 
 	internal static AppletInfo build_info() {
         AppletInfo applet_info = new AppletInfo();
