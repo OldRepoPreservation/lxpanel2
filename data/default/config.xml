@@ -48,6 +48,8 @@
                 <expand>true</expand>
             </applet>
 
+            <applet type="mounts" />
+
 			<applet type="netstatus">
 				<iface>eth0</iface>
 				<command>network-admin</command>

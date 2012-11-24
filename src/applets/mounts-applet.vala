@@ -154,15 +154,17 @@ public class MountsApplet : MenuButton, Applet {
 	}
 
 	private void on_volume_added(VolumeMonitor volmon, Volume volume) {
-		var item = new Gtk.ImageMenuItem.with_label(volume.get_name());
-		var image = new Gtk.Image.from_gicon(volume.get_icon(), Gtk.IconSize.MENU);
-		item.set_image(image);
-		item.show();
-		item.set_data<Volume>("volume", volume);
-		// create submenu for the volume
-		var sub_menu = create_submenu(volume);
-		item.set_submenu(sub_menu);
-		menu.append(item);
+        if(find_item_by_volume(volume) == null) {
+            var item = new Gtk.ImageMenuItem.with_label(volume.get_name());
+            var image = new Gtk.Image.from_gicon(volume.get_icon(), Gtk.IconSize.MENU);
+            item.set_image(image);
+            item.show();
+            item.set_data<Volume>("volume", volume);
+            // create submenu for the volume
+            var sub_menu = create_submenu(volume);
+            item.set_submenu(sub_menu);
+            menu.append(item);
+        }
 	}
 
 	private void on_volume_removed(VolumeMonitor volmon, Volume volume) {
