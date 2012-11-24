@@ -55,7 +55,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         var n_screens = display.get_n_screens();
         for(int i = 0; i < n_screens; ++i) {
             var screen = display.get_screen(i);
-            screen.size_changed.connect(on_screen_size_changed);
             screen.monitors_changed.connect(on_monitors_changed);
         }
     }
@@ -67,7 +66,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         var n_screens = display.get_n_screens();
         for(int i = 0; i < n_screens; ++i) {
             var screen = display.get_screen(i);
-            screen.size_changed.disconnect(on_screen_size_changed);
             screen.monitors_changed.disconnect(on_monitors_changed);
         }
     }
@@ -77,11 +75,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         if(all_panels == null)
             finalize_multi_monitors();
 	}
-
-    // if size of the whole screen is changed.
-    private static void on_screen_size_changed(Gdk.Screen screen) {
-        print("screen size changed\n");
-    }
 
     // if size or numbers of monitors change
 	private static void on_monitors_changed(Gdk.Screen screen) {
@@ -144,15 +137,20 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     // when the size or position of the panel window is changed.
     protected override bool configure_event(Gdk.EventConfigure event) {
         var ret = base.configure_event(event);
-        rect.x = event.x;
-        rect.y = event.y;
-        rect.width = event.width;
-        rect.height = event.height;
-        // when receiving a "configure-event" signal, the position and
-        // size of the window is changed, so it's the right time to update
-        // the space we ask the window manager to reserve for us.
-        if(reserve_space)
-            reserve_screen_space(get_window(), position, rect);
+        if(rect.x != event.x || rect.y != event.y || rect.width != event.width || rect.height != event.height) {
+            rect.x = event.x;
+            rect.y = event.y;
+            rect.width = event.width;
+            rect.height = event.height;
+            // when receiving a "configure-event" signal, the position and
+            // size of the window is changed, so it's the right time to update
+            // the space we ask the window manager to reserve for us.
+            if(reserve_space) {
+                // this takes some X roundtrip and is very expansive.
+                // do it only when the new size is really different.
+                reserve_screen_space(get_window(), position, rect);
+            }
+        }
         return ret;
     }
 
@@ -160,8 +158,8 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	protected override void size_allocate(Gtk.Allocation allocation) {
 		base.size_allocate(allocation);
         Gdk.Rectangle arect = (Gdk.Rectangle)allocation;
-        if(arect != rect) { // if the panel size is really changed
-            rect = arect;
+        // we only reposition the panel if its size is really changed
+        if(arect.width != rect.width || arect.height != rect.height) {
             if(length_mode == SizeMode.AUTO)
                 update_geometry(); // reposition the panel
         }
@@ -238,7 +236,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 				length = int.parse(child.val);
 			}
 			else if(child.name == "length_mode") {
-				length = enum_nick_parse<SizeMode>(child.val);
+				length_mode = enum_nick_parse<SizeMode>(child.val);
 			}
             else if(child.name == "alignment") {
                 alignment = double.parse(child.val);
@@ -271,6 +269,12 @@ public class Panel : Gtk.Window, Gtk.Orientable {
             else if(child.name == "monitor") {
                 set_monitor(int.parse(child.val));
             }
+            else if(child.name == "span_monitors") {
+                span_monitors = bool.parse(child.val);
+            }
+            else if(child.name == "auto_hide") {
+                auto_hide = bool.parse(child.val);
+            }
 		}
 
         // Settings XScreen number is an ancient featurea and is very rarely used.
@@ -285,19 +289,21 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
 	public bool save_panel(GMarkupDom.Node node) {
 		node.new_child("position", enum_to_nick<Gtk.PositionType>(position));
-		node.new_child("monitor", monitor.to_string());
-		node.new_child("xscreen", screen_num.to_string());
 		node.new_child("left_margin", left_margin.to_string());
 		node.new_child("top_margin", top_margin.to_string());
 		node.new_child("right_margin", right_margin.to_string());
 		node.new_child("bottom_margin", bottom_margin.to_string());
-		node.new_child("reserve_space", reserve_space.to_string());
-		node.new_child("auto_hide", auto_hide.to_string());
 		node.new_child("icon_size", icon_size.to_string());
 		node.new_child("thickness", thickness.to_string());
 		node.new_child("length", length.to_string());
 		node.new_child("length_mode", enum_to_nick<SizeMode>(length_mode));
         node.new_child("alignment", alignment.to_string());
+		node.new_child("reserve_space", reserve_space.to_string());
+		node.new_child("auto_hide", auto_hide.to_string());
+		node.new_child("monitor", monitor.to_string());
+		node.new_child("xscreen", screen_num.to_string());
+		node.new_child("span_monitors", span_monitors.to_string());
+		node.new_child("auto_hide", auto_hide.to_string());
 		unowned GMarkupDom.Node applets = node.new_child("applets");
 		foreach(unowned Applet applet in get_applets()) {
 			unowned AppletInfo info = applet.get_info();
@@ -404,7 +410,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         if(length_mode != SizeMode.AUTO)
             set_size_request(width, height);
 		move(x, y); // reposition the panel
-        print("%d, %d, %d, %d\n", x, y, width, height);
+        print("%s: %d, %d, %d, %d, %d, %d\n", id, x, y, width, height, length, length_mode);
 	}
 
 	// for Gtk.Orientable iface
@@ -598,7 +604,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	private bool span_monitors = false; // span across monitors
 	private int thickness = 26; // size of the panel
     private int length = 100; // length of the panel
-    private SizeMode length_mode = SizeMode.PERCENT; // mode of length;
+    private SizeMode length_mode = SizeMode.AUTO; // mode of length;
     private double alignment = 0.5; // alignment of the panel, 0.0 - 1.0
     private int screen_num = 0; // index of X Screen the panel belongs to (multi-screen setup is rare nowadays)
 	private int monitor = 0; // index of the monitor

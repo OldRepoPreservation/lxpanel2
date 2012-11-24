@@ -5,12 +5,21 @@
 		<logout_command>lxde-logout</logout_command>
 	</global>
 	<panel id="top_panel">
-		<orientation>horizontal</orientation>
 		<position>top</position>
+        <left_margin>0</left_margin>
+        <top_margin>0</top_margin>
+        <right_margin>0</right_margin>
+        <bottom_margin>0</bottom_margin>
 		<icon_size>24</icon_size>
-		<size>26</size>
-		<auto_hide>false</auto_hide>
+		<thickness>26</thickness>
+        <length>100</length>
+        <length_mode>percent</length_mode>
+        <alignment>0.5</alignment>
 		<reserve_space>true</reserve_space>
+		<auto_hide>false</auto_hide>
+        <span_monitors>false</span_monitors>
+        <monitor>0</monitor>
+        <xscreen>0</xscreen>
 		<applets>
 
 			<applet type="appmenu">
@@ -34,14 +43,13 @@
 					<label>Google Chrome</label>
 				</button>
 			</applet>
+            
+            <applet type="blank">
+                <expand>true</expand>
+            </applet>
 
 			<applet type="netstatus">
 				<iface>eth0</iface>
-				<command>network-admin</command>
-			</applet>
-
-			<applet type="netstatus">
-				<iface>wlan0</iface>
 				<command>network-admin</command>
 			</applet>
 
@@ -61,12 +69,21 @@
 		</applets>
 	</panel>
 	<panel id="bottom_panel">
-		<orientation>horizontal</orientation>
 		<position>bottom</position>
+        <left_margin>0</left_margin>
+        <top_margin>0</top_margin>
+        <right_margin>0</right_margin>
+        <bottom_margin>0</bottom_margin>
 		<icon_size>24</icon_size>
-		<size>26</size>
-		<auto_hide>false</auto_hide>
+		<thickness>26</thickness>
+        <length>100</length>
+        <length_mode>percent</length_mode>
+        <alignment>0.5</alignment>
 		<reserve_space>true</reserve_space>
+		<auto_hide>false</auto_hide>
+        <span_monitors>false</span_monitors>
+        <monitor>0</monitor>
+        <xscreen>0</xscreen>
 		<applets>
 			<applet type="showdesktop" />
 

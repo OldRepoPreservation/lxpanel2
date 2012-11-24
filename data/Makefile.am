@@ -4,8 +4,8 @@ SUBDIRS= \
 	ui \
 	$(NULL)
 
-defaultdir=$(sysconfdir)/lxpanel2/default
-default_DATA= \
+defaultconfigdir=$(sysconfdir)/xdg/lxpanel2/default
+defaultconfig_DATA= \
 	default/config.xml \
 	$(NULL)
 
@@ -17,6 +17,6 @@ applets_DATA = $(applets_in_files:.desktop.in=.desktop)
 @INTLTOOL_DESKTOP_RULE@
 
 EXTRA_DIST= \
-	$(default_DATA) \
+	$(defaultconfig_DATA) \
 	$(applets_DATA) \
 	$(NULL)
