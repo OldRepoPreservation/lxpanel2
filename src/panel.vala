@@ -240,6 +240,9 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 			else if(child.name == "length_mode") {
 				length = enum_nick_parse<SizeMode>(child.val);
 			}
+            else if(child.name == "alignment") {
+                alignment = double.parse(child.val);
+            }
 			else if(child.name == "left_margin") {
 				left_margin = int.parse(child.val);
 			}
@@ -294,6 +297,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		node.new_child("thickness", thickness.to_string());
 		node.new_child("length", length.to_string());
 		node.new_child("length_mode", enum_to_nick<SizeMode>(length_mode));
+        node.new_child("alignment", alignment.to_string());
 		unowned GMarkupDom.Node applets = node.new_child("applets");
 		foreach(unowned Applet applet in get_applets()) {
 			unowned AppletInfo info = applet.get_info();
@@ -376,7 +380,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
                 width = length;
             else
                 width = get_allocated_width();
-            x = monitor_rect.x + (monitor_rect.width - width) / 2;
+            x = monitor_rect.x + (int)((monitor_rect.width - width) * alignment);
             if(position == Gtk.PositionType.BOTTOM)
                 y = (monitor_rect.y + monitor_rect.height) - height;
             else
@@ -390,7 +394,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
                 height = length;
             else
                 height = get_allocated_height();
-            y = monitor_rect.y + (monitor_rect.height - height) / 2;
+            y = monitor_rect.y + (int)((monitor_rect.height - height) * alignment);
             if(position == Gtk.PositionType.RIGHT)
                 x = (monitor_rect.x + monitor_rect.width) - width;
             else
@@ -505,7 +509,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 					all_panels.append(panel);
 					// stdout.printf("load panel\n");
 					panel.load_panel(child);
-					panel.show();
 				}
 				else if(child.name == "global") {
 					// global settings apply to all panels
@@ -519,7 +522,10 @@ public class Panel : Gtk.Window, Gtk.Orientable {
             for(int i = 0; i < n_screens; ++i) {
                 on_monitors_changed(display.get_screen(i));
             }
-
+            // show them after repositioning.
+            foreach(unowned Panel panel in all_panels) {
+                panel.show();
+            }
 		}
 		else
 			return false;
@@ -593,6 +599,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	private int thickness = 26; // size of the panel
     private int length = 100; // length of the panel
     private SizeMode length_mode = SizeMode.PERCENT; // mode of length;
+    private double alignment = 0.5; // alignment of the panel, 0.0 - 1.0
     private int screen_num = 0; // index of X Screen the panel belongs to (multi-screen setup is rare nowadays)
 	private int monitor = 0; // index of the monitor
 	private bool auto_hide = false; // automatically hide the panel
