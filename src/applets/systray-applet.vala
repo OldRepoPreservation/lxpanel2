@@ -21,22 +21,27 @@
 
 namespace Lxpanel {
 
-public class SysTrayApplet : Gtk.Frame, Applet {
+public class SysTrayApplet : Applet {
 
 	construct {
-        set_shadow_type(Gtk.ShadowType.NONE);
+        frame = new Gtk.Frame("");
+        frame.show();
+        frame.set_shadow_type(Gtk.ShadowType.NONE);
+        pack_start(frame, false, true, 0);
 	}
 
-    protected void set_panel(Panel panel) {
+    protected override void parent_set(Gtk.Widget? old_parent) {
+        // base.parent_set(old_parent);
         if(tray == null) {
-            tray = new Na.Tray.for_screen(panel.get_screen(), panel.orientation);
+            tray = new Na.Tray.for_screen(get_screen(), orientation);
             tray.set_padding(1);
             tray.show();
             add(tray);
         }
     }
 
-    protected void set_panel_orientation(Gtk.Orientation orient) {
+    protected override void set_panel_orientation(Gtk.Orientation orient) {
+        base.set_panel_orientation(orient);
         orientation = orient;
     }
 
@@ -52,7 +57,8 @@ public class SysTrayApplet : Gtk.Frame, Applet {
 		}
 	}
 
-	public new void set_icon_size(int size) {
+	public override void set_icon_size(int size) {
+        base.set_icon_size(size);
         if(tray != null) {
             tray.set_icon_size(size);
         }
@@ -82,6 +88,7 @@ public class SysTrayApplet : Gtk.Frame, Applet {
 
     Na.Tray? tray;
     Gtk.Orientation _orientation;
+    Gtk.Frame frame;
 }
 
 }

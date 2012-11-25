@@ -21,36 +21,29 @@
 
 namespace Lxpanel {
 
-public class BlankApplet : Gtk.Box, Applet {
+public class BlankApplet : Applet {
 
 	construct {
 	}
 
-	public bool get_expand() {
-		return expand;
-	}
-
-	public void set_expand(bool expand) {
-		this.expand = expand;
-	}
-
-	public bool load_config(GMarkupDom.Node config_node) {
+	public override bool load_config(GMarkupDom.Node config_node) {
+        base.load_config(config_node);
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 			if(child.name == "size") {
 				size = int.parse(child.val);
 			}
 			else if(child.name == "expand") {
-				expand = bool.parse(child.val);
+				set_expand(bool.parse(child.val));
 			}
 		}
 		return true;
 	}
 
-	public void save_config(GMarkupDom.Node config_node) {
+	public override void save_config(GMarkupDom.Node config_node) {
+        base.save_config(config_node);
 		if(size > 0)
 			config_node.new_child("size", size.to_string());
-		if(expand == true)
-			config_node.new_child("expand", expand.to_string());
+        config_node.new_child("expand", get_expand().to_string());
 	}
 	
 	protected override void get_preferred_width(out int min, out int natral) {
@@ -75,8 +68,6 @@ public class BlankApplet : Gtk.Box, Applet {
 		applet_info.description= _("Blank space");
 		return (owned)applet_info;
 	}
-
-    bool expand;
 	int size;
 }
 

@@ -4,9 +4,11 @@ namespace Lxpanel {
 const string DEFAULT_TIP_FORMAT = "%A %x";
 const string DEFAULT_CLOCK_FORMAT = "%R";
 
-public class ClockApplet : Gtk.Label, Applet {
+public class ClockApplet : Applet {
 
 	construct {
+        label = new Gtk.Label("");
+        label.show();
 		timeout = Timeout.add(1000, on_timeout);
 		on_timeout();
 	}
@@ -22,7 +24,7 @@ public class ClockApplet : Gtk.Label, Applet {
 		var _time = time_t();
 		Time local_time = Time.local(_time);
 		var text = local_time.format(DEFAULT_CLOCK_FORMAT);
-		set_label(text);
+		label.set_label(text);
 		return true;
 	}
 
@@ -36,6 +38,7 @@ public class ClockApplet : Gtk.Label, Applet {
 	}
 
 	private uint timeout;
+    Gtk.Label label;
 }
 
 }

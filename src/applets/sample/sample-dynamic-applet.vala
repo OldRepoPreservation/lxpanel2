@@ -21,7 +21,7 @@
 
 namespace Lxpanel {
 
-public class SampleDynamicApplet : Gtk.Box, Applet {
+public class SampleDynamicApplet : Applet {
 	construct {
 		var label = new Gtk.Label("Test");
 		label.show();

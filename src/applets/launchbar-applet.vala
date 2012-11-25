@@ -66,7 +66,7 @@ public class LaunchButton : Button {
 }
 
 
-public class LaunchbarApplet : Gtk.Box, Applet {
+public class LaunchbarApplet : Applet {
 
 	construct {
 		set("orientation", Gtk.Orientation.HORIZONTAL, null);
@@ -122,7 +122,8 @@ public class LaunchbarApplet : Gtk.Box, Applet {
 		return true;
 	}
 
-	public bool load_config(GMarkupDom.Node config_node) {
+	public override bool load_config(GMarkupDom.Node config_node) {
+        base.load_config(config_node);
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 			if(child.name == "button") {
 				load_button(child);
@@ -132,7 +133,8 @@ public class LaunchbarApplet : Gtk.Box, Applet {
 		return true;
 	}
 	
-	public void save_config(GMarkupDom.Node config_node) {
+	public override void save_config(GMarkupDom.Node config_node) {
+        base.save_config(config_node);
 		foreach(weak Gtk.Widget child in get_children()) {
 			var btn = (LaunchButton)child;
 			unowned GMarkupDom.Node btn_node;

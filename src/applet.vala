@@ -65,7 +65,7 @@ public class AppletInfo {
 }
 
 
-public interface Applet : Gtk.Widget {
+public class Applet : Gtk.Box {
 
     public unowned Panel? get_panel() {
         var box = get_parent();
@@ -75,25 +75,35 @@ public interface Applet : Gtk.Widget {
     }
 
     public virtual bool get_expand() {
-        return false;
+        return expand;
     }
 
     public virtual void set_expand(bool expand) {
-    }
-
-    public virtual void set_panel(Panel panel) {
-        set_panel_orientation(panel.orientation);
-        set_panel_position(panel.get_position());
-        set_icon_size(panel.get_icon_size());
+        this.expand = expand;
     }
 
     public virtual void set_panel_orientation(Gtk.Orientation orientation) {
+        panel_orientation = orientation;
+    }
+
+    public virtual Gtk.Orientation get_panel_orientation() {
+        return panel_orientation;
     }
 
     public virtual void set_panel_position(Gtk.PositionType pos) {
+        panel_position = pos;
+    }
+
+    public virtual Gtk.PositionType get_panel_position() {
+        return panel_position;
     }
 
     public virtual void set_icon_size(int size) {
+        icon_size = size;
+    }
+
+    public virtual int get_icon_size() {
+        return icon_size;
     }
 
     public virtual unowned AppletInfo get_info() {
@@ -221,6 +231,11 @@ public interface Applet : Gtk.Widget {
         // we will enumerate all available modules when needed.
         // register_modules();
     }
+
+    bool expand;
+    int icon_size;
+    Gtk.Orientation panel_orientation;
+    Gtk.PositionType panel_position;
 }
 
 }

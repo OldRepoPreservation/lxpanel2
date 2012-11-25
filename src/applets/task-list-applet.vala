@@ -157,14 +157,15 @@ public class TaskButton : Button {
 }
 
 
-public class TaskListApplet : Grid, Applet, Gtk.Orientable {
+public class TaskListApplet : Applet, Gtk.Orientable {
 
 	public TaskListApplet(Panel panel) {
 		this.panel = panel;
+        this.grid = new Grid();
+
 		set_has_window(false);
 		set_orientation(Gtk.Orientation.HORIZONTAL);
 		set_size_request(1, 1);
-		expand = true;
 
 		min_btn_size = 64;
 		max_btn_size = 150;
@@ -391,6 +392,8 @@ public class TaskListApplet : Grid, Applet, Gtk.Orientable {
 	private weak Wnck.Screen screen;
 	private HashTable<weak Wnck.Window, weak TaskButton> hash;
 	private weak Panel panel;
+
+    private Grid grid;
 }
 
 }

@@ -48,7 +48,7 @@ public class Lxpanel : Object {
 			foreach(weak Applet applet in applets) {
 				if(applet is AppMenuApplet) {
 					AppMenuApplet appmenu = (AppMenuApplet)applet;
-					appmenu.clicked();
+					appmenu.popup_menu();
 					return;
 				}
 			}

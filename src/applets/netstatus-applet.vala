@@ -21,17 +21,19 @@
 
 namespace Lxpanel {
 
-public class NetstatusApplet : Gtk.EventBox, Applet {
+public class NetstatusApplet : Applet {
 
 	construct {
-		set_visible_window(false);
+        event_box = new Gtk.EventBox();
+		event_box.set_visible_window(false);
+        pack_start(event_box, false, true, 0);
 		image = new Gtk.Image.from_gicon(icon_idle, Gtk.IconSize.MENU);
-
-		add(image);
+		event_box.add(image);
 		show_all();
 	}
 
-    public void set_icon_size(int size) {
+    public override void set_icon_size(int size) {
+        base.set_icon_size(size);
 		// Setting "pixel-size" property of Gtk.Image can override size
 		// determined by Gtk.IconSize.
 		image.pixel_size = size;
@@ -58,6 +60,7 @@ public class NetstatusApplet : Gtk.EventBox, Applet {
 	}
 
 	public virtual bool load_config(GMarkupDom.Node config_node) {
+        base.load_config(config_node);
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 			if(child.name == "iface") {
 				if(child.val != null) {
@@ -71,6 +74,7 @@ public class NetstatusApplet : Gtk.EventBox, Applet {
 	}
 	
 	public virtual void save_config(GMarkupDom.Node config_node) {
+        base.save_config(config_node);
 		if(iface != null)
 			config_node.new_child("iface", iface);
 	}
@@ -129,6 +133,7 @@ public class NetstatusApplet : Gtk.EventBox, Applet {
 
 	uint timeout_id = 0;
 	string iface = "eth0"; // network interface
+    Gtk.EventBox event_box;
 	Gtk.Image image;
 
 	uint64 last_rx;

@@ -21,15 +21,18 @@
 
 namespace Lxpanel {
 
-public class AppMenuApplet : MenuButton, Applet {
+public class AppMenuApplet : Applet {
 
 	construct {
-		set_tooltip_text(_("Applications"));
-		set_icon_pixbuf(new Gdk.Pixbuf.from_file("/usr/share/lubuntu/images/lubuntu-logo.png"));
+        button = new MenuButton();
+		button.set_tooltip_text(_("Applications"));
+		button.set_icon_pixbuf(new Gdk.Pixbuf.from_file("/usr/share/lubuntu/images/lubuntu-logo.png"));
+        pack_start(button, false, true, 0);
+        button.show();
 
 		var menu = new Gtk.Menu();
 		menu.show_all();
-		set_menu(menu);
+		button.set_menu(menu);
 
 		menu_cache = MenuCache.Cache.lookup("applications.menu");
 		if(menu_cache != null) {
@@ -84,9 +87,13 @@ public class AppMenuApplet : MenuButton, Applet {
 
 	private void reload_menu() {
 		unowned MenuCache.Dir dir = menu_cache.get_root_dir();
-		Gtk.Menu menu = (Gtk.Menu)get_menu();
+		Gtk.Menu menu = (Gtk.Menu)button.get_menu();
 		add_menu_items(menu, dir);
 	}
+
+    public void popup_menu() {
+        button.clicked();
+    }
 
 	public static AppletInfo build_info() {
         AppletInfo applet_info = new AppletInfo();
@@ -99,6 +106,7 @@ public class AppMenuApplet : MenuButton, Applet {
 
 	private MenuCache.Cache? menu_cache;
 	private void* menu_cache_reload_notify;
+    MenuButton button;
 }
 
 }

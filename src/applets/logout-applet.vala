@@ -21,18 +21,21 @@
 
 namespace Lxpanel {
 
-class LogoutApplet : Button, Applet {
+class LogoutApplet : Applet {
 
 	construct {
-		set_tooltip_text(_("Logout"));
+        button = new Button();
+		button.set_tooltip_text(_("Logout"));
+        button.clicked.connect(on_button_clicked);
 		show_all();
 	}
-    
-    protected void set_icon_size(int size) {
-		set_gicon(new ThemedIcon("system-log-out"), size);
+
+    protected override void set_icon_size(int size) {
+        base.set_icon_size(size);
+		button.set_gicon(new ThemedIcon("system-log-out"), size);
     }
 
-	protected override void clicked() {
+	protected void on_button_clicked() {
 		unowned string? command = Panel.get_logout_command();
 		if(command != null)
 			Process.spawn_command_line_async(command);
@@ -46,6 +49,8 @@ class LogoutApplet : Button, Applet {
 		applet_info.description= _("Logout Button");
         return (owned)applet_info;
 	}
+
+    Button button;
 }
 
 }

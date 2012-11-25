@@ -21,30 +21,28 @@
 
 namespace Lxpanel {
 
-public class PlacesApplet : Drawer, Applet {
+public class PlacesApplet : Applet {
 
 	construct {
+        drawer = new Drawer();
+        drawer.show();
+        pack_start(drawer, false, true, 0);
 	}
 
-    protected void set_icon_size(int size) {
-		set_gicon(new ThemedIcon("user-home"), size);
+    protected override void set_icon_size(int size) {
+        base.set_icon_size(size);
+		drawer.set_gicon(new ThemedIcon("user-home"), size);
     }
 
-	public bool get_expand() {
-		return expand;
-	}
-
-	public void set_expand(bool expand) {
-		this.expand = expand;
-	}
-
-	public bool load_config(GMarkupDom.Node config_node) {
+	public override bool load_config(GMarkupDom.Node config_node) {
+        base.load_config(config_node);
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 		}
 		return true;
 	}
 
-	public void save_config(GMarkupDom.Node config_node) {
+	public override void save_config(GMarkupDom.Node config_node) {
+        base.save_config(config_node);
 	}
 
 	public static AppletInfo build_info() {
@@ -56,7 +54,7 @@ public class PlacesApplet : Drawer, Applet {
         return applet_info;
 	}
 
-	bool expand;
+	Drawer? drawer;
 }
 
 }

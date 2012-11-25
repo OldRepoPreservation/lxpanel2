@@ -21,17 +21,22 @@
 
 namespace Lxpanel {
 
-public class ShowDesktopApplet : Button, Applet {
+public class ShowDesktopApplet : Applet {
 
 	construct {
-		set_tooltip_text(_("Show Desktop"));
+        button = new Button();
+		button.set_tooltip_text(_("Show Desktop"));
+        button.clicked.connect(button_clicked);
+        button.show();
+        pack_start(button, false, true, 0);
 	}
 
-    protected void set_icon_size(int size) {
-		set_gicon(new ThemedIcon("user-desktop"), size);
+    protected override void set_icon_size(int size) {
+        base.set_icon_size(size);
+		button.set_gicon(new ThemedIcon("user-desktop"), size);
     }
 
-	protected override void clicked() {
+	protected void button_clicked() {
 		var n = get_screen().get_number();
 		var screen = Wnck.Screen.get(n);
 		if(screen != null) {
@@ -53,6 +58,7 @@ public class ShowDesktopApplet : Button, Applet {
         return (owned)applet_info;
 	}
 
+    Button? button;
 }
 
 }

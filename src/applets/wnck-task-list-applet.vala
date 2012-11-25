@@ -23,34 +23,39 @@
 
 namespace Lxpanel {
 
-public class WnckTaskListApplet : Wnck.Tasklist, Applet {
+public class WnckTaskListApplet : Applet {
 
     construct {
-        set_button_relief(Gtk.ReliefStyle.NONE);
-        set_grouping(Wnck.TasklistGroupingType.AUTO_GROUP);
+        tasklist = new Wnck.Tasklist();
+        tasklist.set_button_relief(Gtk.ReliefStyle.NONE);
+        tasklist.set_grouping(Wnck.TasklistGroupingType.AUTO_GROUP);
+        tasklist.show();
+        pack_start(tasklist, false, true, 0);
+        set_expand(true);
     }
-	public bool get_expand() {
-		return expand;
-	}
-
-	public void set_expand(bool expand) {
-		this.expand = expand;
-        if(expand == true) {
-        }
-	}
 
 	public bool load_config(GMarkupDom.Node config_node) {
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
-			if(child.name == "expand") {
-				expand = bool.parse(child.val);
+			if(child.name == "all_workspace") {
+                all_workspace = bool.parse(child.val);
+				tasklist.set_include_all_workspaces(all_workspace);
+			}
+			else if(child.name == "grouping") {
+                if(child.val == "auto")
+                    grouping = Wnck.TasklistGroupingType.AUTO_GROUP;
+                else if(child.val == "never")
+                    grouping = Wnck.TasklistGroupingType.NEVER_GROUP;
+                else if(child.val == "always")
+                    grouping = Wnck.TasklistGroupingType.ALWAYS_GROUP;
+                tasklist.set_grouping(grouping);
 			}
 		}
 		return true;
 	}
 
 	public void save_config(GMarkupDom.Node config_node) {
-		if(expand == true)
-			config_node.new_child("expand", expand.to_string());
+        config_node.new_child("all_workspace", all_workspace.to_string());
+        config_node.new_child("grouping", enum_to_nick<Wnck.TasklistGroupingType>(grouping));
 	}
 
     protected override void get_preferred_width(out int min, out int natural) {
@@ -84,7 +89,10 @@ public class WnckTaskListApplet : Wnck.Tasklist, Applet {
 		applet_info.description= _("Tasklist");
         return (owned)applet_info;
 	}
-	bool expand = true;
+
+    Wnck.Tasklist tasklist;
+    bool all_workspace = false;
+    Wnck.TasklistGroupingType grouping = Wnck.TasklistGroupingType.AUTO_GROUP;
 }
 
 }

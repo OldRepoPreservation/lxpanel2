@@ -21,12 +21,16 @@
 
 namespace Lxpanel {
 
-public class MountsApplet : MenuButton, Applet {
+public class MountsApplet : Applet {
 
 	construct {
+        button = new MenuButton();
+        pack_start(button, false, true, 0);
+        button.show();
+
 		menu = new Gtk.Menu();
-		set_menu(menu);
-		set_tooltip_text(_("Mounted Volumes"));
+		button.set_menu(menu);
+		button.set_tooltip_text(_("Mounted Volumes"));
 
 		monitor = VolumeMonitor.get();
 		monitor.volume_added.connect(on_volume_added);
@@ -214,19 +218,13 @@ public class MountsApplet : MenuButton, Applet {
 	private void on_mount_changed(VolumeMonitor volmon, Mount mount) {
 	}
 
-	public void set_icon_size(int size) {
-		set_gicon(new ThemedIcon("drive-removable-media"), size);
-	}
-
-	public bool get_expand() {
-		return expand;
-	}
-
-	public void set_expand(bool expand) {
-		this.expand = expand;
+	public override void set_icon_size(int size) {
+        base.set_icon_size(size);
+		button.set_gicon(new ThemedIcon("drive-removable-media"), size);
 	}
 
 	public bool load_config(GMarkupDom.Node config_node) {
+        base.load_config(config_node);
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 			if(child.name == "show_mounts") {
 				show_mounts = bool.parse(child.val);
@@ -236,6 +234,7 @@ public class MountsApplet : MenuButton, Applet {
 	}
 
 	public void save_config(GMarkupDom.Node config_node) {
+        base.save_config(config_node);
 		if(show_mounts)
 			config_node.new_child("show_mounts", show_mounts.to_string());
 	}
@@ -250,8 +249,8 @@ public class MountsApplet : MenuButton, Applet {
 	}
 
 	VolumeMonitor? monitor;
+    MenuButton button;
 	Gtk.Menu? menu;
-    bool expand;
 	bool show_mounts;
 }
 

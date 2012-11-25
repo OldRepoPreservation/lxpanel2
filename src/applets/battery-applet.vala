@@ -41,7 +41,8 @@ private class PowerDevice : Object {
 	public UPower.Device udevice;
 }
 
-public class BatteryApplet : Gtk.Box, Applet {
+
+public class BatteryApplet : Applet {
 
 	construct {
 		upower = Bus.get_proxy_sync(BusType.SYSTEM, 

@@ -21,30 +21,32 @@
 
 namespace Lxpanel {
 
-public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
+public class PagerApplet : Applet, Gtk.Orientable {
 
 	construct {
-        icon_size = 20;
+        pager = new Wnck.Pager();
+        pager.show();
+        pack_start(pager, false, true, 0);
 		n_rows = 1;
-		set_n_rows(1);
-		set_shadow_type(Gtk.ShadowType.NONE);
+		pager.set_n_rows(1);
+		pager.set_shadow_type(Gtk.ShadowType.NONE);
 	}
 
-    protected void set_panel_orientation(Gtk.Orientation orient) {
-        _orientation = orient;
-		set_orientation(_orientation);
+    protected override void set_panel_orientation(Gtk.Orientation orient) {
+        base.set_panel_orientation(orient);
+        orientation = orient;
     }
 
-    protected void set_icon_size(int size) {
+    protected override void set_icon_size(int size) {
         // FIXME: is this correct?
-        icon_size = size;
+        base.set_icon_size(size);
 		set_size_request(size, size);
     }
 
 	public override void get_preferred_height(out int min_h, out int natral_h) {
 		if(orientation == Gtk.Orientation.HORIZONTAL) {
 			min_h = 1;
-			natral_h = icon_size;
+			natral_h = get_icon_size();
 		}
 		else {
 			base.get_preferred_width(out min_h, out natral_h);
@@ -55,7 +57,7 @@ public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 	public override void get_preferred_width(out int min_w, out int natral_w) {
 		if(orientation == Gtk.Orientation.VERTICAL) {
 			min_w = 1;
-			natral_w = icon_size;
+			natral_w = get_icon_size();
 		}
 		else {
 			base.get_preferred_width(out min_w, out natral_w);
@@ -69,7 +71,7 @@ public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 		set {
 			if(_orientation != value) {
 				_orientation = value;
-				set_orientation(value);
+				pager.set_orientation(value);
 			}
 		}
 	}
@@ -78,7 +80,7 @@ public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 			if(child.name == "rows") {
 				n_rows = int.parse(child.val);
-				set_n_rows(n_rows);
+				pager.set_n_rows(n_rows);
 			}
 		}
 		return true;
@@ -101,6 +103,7 @@ public class PagerApplet : Wnck.Pager, Applet, Gtk.Orientable {
 	Gtk.Orientation _orientation;
 	int n_rows;
     int icon_size;
+    Wnck.Pager? pager;
 }
 
 }

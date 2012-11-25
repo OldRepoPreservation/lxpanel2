@@ -318,7 +318,11 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		box.pack_start(applet, applet.get_expand(), true);
 		if(index >= 0)
 			box.reorder_child(applet, index);
-		applet.set_panel(this);
+
+        applet.set_panel_orientation(_orientation);
+        applet.set_panel_position(position);
+        applet.set_icon_size(icon_size);
+
 		applet.show();
 	}
 

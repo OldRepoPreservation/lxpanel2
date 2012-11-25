@@ -95,9 +95,7 @@
 
 			<applet type="wncktasklist">
 				<all_workspace>false</all_workspace>
-				<show_icon>true</show_icon>
-				<show_label>false</show_label>
-				<group_windows>false</group_windows>
+				<grouping>auto</grouping>
 			</applet>
 		</applets>
 	</panel>
