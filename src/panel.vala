@@ -24,7 +24,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		box.show();
 		add(box);
 
-        rect.x = rect.y = rect.width = rect.height = 0;
+        old_rect.x = old_rect.y = old_rect.width = old_rect.height = 0;
 
 		set_border_width(1);
 		// set_app_paintable(true);
@@ -137,18 +137,18 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     // when the size or position of the panel window is changed.
     protected override bool configure_event(Gdk.EventConfigure event) {
         var ret = base.configure_event(event);
-        if(rect.x != event.x || rect.y != event.y || rect.width != event.width || rect.height != event.height) {
-            rect.x = event.x;
-            rect.y = event.y;
-            rect.width = event.width;
-            rect.height = event.height;
+        if(old_rect.x != event.x || old_rect.y != event.y || old_rect.width != event.width || old_rect.height != event.height) {
+            old_rect.x = event.x;
+            old_rect.y = event.y;
+            old_rect.width = event.width;
+            old_rect.height = event.height;
             // when receiving a "configure-event" signal, the position and
             // size of the window is changed, so it's the right time to update
             // the space we ask the window manager to reserve for us.
             if(reserve_space) {
                 // this takes some X roundtrip and is very expansive.
                 // do it only when the new size is really different.
-                reserve_screen_space(get_window(), position, rect);
+                reserve_screen_space(get_window(), position, old_rect);
             }
         }
         return ret;
@@ -157,9 +157,9 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     // when size of the panel allocated by gtk+ is changed.
 	protected override void size_allocate(Gtk.Allocation allocation) {
 		base.size_allocate(allocation);
-        Gdk.Rectangle arect = (Gdk.Rectangle)allocation;
+        Gdk.Rectangle alloc_rect = (Gdk.Rectangle)allocation;
         // we only reposition the panel if its size is really changed
-        if(arect.width != rect.width || arect.height != rect.height) {
+        if(alloc_rect.width != old_rect.width || alloc_rect.height != old_rect.height) {
             if(length_mode == SizeMode.AUTO)
                 update_geometry(); // reposition the panel
         }
@@ -410,7 +410,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         if(length_mode != SizeMode.AUTO)
             set_size_request(width, height);
 		move(x, y); // reposition the panel
-        print("%s: %d, %d, %d, %d, %d, %d\n", id, x, y, width, height, length, length_mode);
+        // print("%s: %d, %d, %d, %d, %d, %d\n", id, x, y, width, height, length, length_mode);
 	}
 
 	// for Gtk.Orientable iface
@@ -515,6 +515,9 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 					all_panels.append(panel);
 					// stdout.printf("load panel\n");
 					panel.load_panel(child);
+                    // realize the panel, so later relayout can trigger
+                    // configure-event correctly. FIXME: this is a little bit hackish.
+                    panel.realize();
 				}
 				else if(child.name == "global") {
 					// global settings apply to all panels
@@ -528,6 +531,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
             for(int i = 0; i < n_screens; ++i) {
                 on_monitors_changed(display.get_screen(i));
             }
+
             // show them after repositioning.
             foreach(unowned Panel panel in all_panels) {
                 panel.show();
@@ -614,7 +618,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
     // GUI stuff
 	private Gtk.Box box; // top box used to group applets
-    private Gdk.Rectangle rect; // rectangle caching the on-screen position & size of the panel.
+    private Gdk.Rectangle old_rect; // rectangle caching the on-screen position & size of the panel.
 
 	// global settings
 	private static string? file_manager; // command used to launch file manager
