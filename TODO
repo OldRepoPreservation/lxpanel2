@@ -1,0 +1,16 @@
+Programming:
+1. Split the main program lxpanel and the applet library liblxpanel-applet.
+   This can prevent back-linking into the executable binary, which is non-portable.
+
+2. Add some file management functionality utilizing libfm
+
+3. Add a GtkTreeView based new application menu.
+
+Documentation:
+1. Write API doc with valadoc and generate gtkdoc compatible files.
+   Using valadoc with automake is currently undocumented, but an example is here:
+   http://code.google.com/p/bump/source/browse/bump/Makefile.am
+
+2. Write a wiki article about config file format.
+
+3. Write a wiki article/tutorial about how to develop an applet.
