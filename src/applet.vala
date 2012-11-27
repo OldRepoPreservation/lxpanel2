@@ -64,46 +64,100 @@ public class AppletInfo {
     }
 }
 
-
+// Base class for all applets
 public class Applet : Gtk.Box {
 
-    public unowned Panel? get_panel() {
-        var box = get_parent();
-        if(box != null)
-            return (Panel)box.get_parent();
-        return null;
+    construct {
     }
 
     public virtual bool get_expand() {
+        // get if the applet is expandable.
+        // by default this returns false.
         return expand;
     }
 
     public virtual void set_expand(bool expand) {
+        // set the applet expandable.
         this.expand = expand;
     }
 
     public virtual void set_panel_orientation(Gtk.Orientation orientation) {
+        // called by the panel when the orientation changes
+        // We don't use Orientable interface + "orientation" property here
+        // because it's possible that the panel and the applet want different
+        // orientations. So we use a separate "panel_orientation".
         panel_orientation = orientation;
     }
 
     public virtual Gtk.Orientation get_panel_orientation() {
+        // get the orientation of the panel containing the applet.
         return panel_orientation;
     }
 
     public virtual void set_panel_position(Gtk.PositionType pos) {
+        // called by the panel when the position of panel changes
         panel_position = pos;
     }
 
     public virtual Gtk.PositionType get_panel_position() {
+        // get position of the panel
         return panel_position;
     }
 
     public virtual void set_icon_size(int size) {
+        // called by the panel when icon size changes
         icon_size = size;
     }
 
     public virtual int get_icon_size() {
+        // get icon size specified for this panel.
         return icon_size;
+    }
+
+    public virtual bool load_config(GMarkupDom.Node config_node) {
+        // called by the panel to load configurations
+        return true;
+    }
+
+    public virtual void save_config(GMarkupDom.Node config_node) {
+        // called by the panel to write configurations
+    }
+
+    public virtual void edit_config(Gtk.Window? parent_window) {
+        // called by the panel configuration UI to launch a preference dialog.
+    }
+
+    public virtual void customize_context_menu(Gtk.UIManager* ui) {
+        // called by the panel to setup the context menu prior to show it.
+    }
+
+    public void show_context_menu() {
+        // emit a signal to ask the panel to show a context menu for the applet
+        var act_grp = new Gtk.ActionGroup("LXPanel");
+        act_grp.add_actions(popup_menu_actions, this);
+        var ui = new Gtk.UIManager();
+        ui.insert_action_group(act_grp, 0);
+        ui.add_ui_from_string(popup_menu_xml, -1);
+        customize_context_menu(ui); // give the derived class a chance to customize the menu
+        var menu = (Gtk.Menu)ui.get_widget("/popup");
+        menu.popup(null, null, null, 3, Gtk.get_current_event_time());
+        // menu.attach_to_widget(applet, null);
+        menu.selection_done.connect(() => {menu.destroy();});
+
+    }
+
+    // mouse button pressed
+    protected override bool button_press_event(Gdk.EventButton evt) {
+        // Normally, we'll never receive this signal because the Applet class
+        // is derived from GtkBox, a type of widget having no window (GTK_NO_WINDOW).
+        // So, X11 never sends the mouse events to us. The button_press_event is
+        // actually received by the Panel and then forwarded to us.
+        if(base.button_press_event != null)
+            base.button_press_event(evt);
+        if(evt.button == 3) { // right click
+            show_context_menu();
+        }
+        return true;
     }
 
     public virtual unowned AppletInfo get_info() {
@@ -135,13 +189,6 @@ public class Applet : Gtk.Box {
             }
         }
         return null;
-    }
-
-    public virtual bool load_config(GMarkupDom.Node config_node) {
-        return true;
-    }
-    
-    public virtual void save_config(GMarkupDom.Node config_node) {
     }
 
     private static void register_modules_in_dir(string dirpath) {
@@ -232,10 +279,59 @@ public class Applet : Gtk.Box {
         // register_modules();
     }
 
-    bool expand;
-    int icon_size;
-    Gtk.Orientation panel_orientation;
-    Gtk.PositionType panel_position;
+    private void on_add_new_applet(Gtk.Action action) {
+        var panel = get_toplevel();
+        if(panel != null) {
+            // here we utilize action signal rather than
+            // calling a method of Panel, so we don't need to be linked 
+            // with the main program lxpanel.
+            GLib.Signal.emit_by_name(panel, "add_applet", this);
+        }
+    }
+
+    private void on_remove_applet(Gtk.Action action) {
+        destroy();
+        // TODO: if the applet is in a dynamic module, and
+        // we released the last references of the applet class,
+        // unload the dynamic module to save memory.
+    }
+
+    private void on_config_applet(Gtk.Action action) {
+        edit_config(null);
+    }
+
+    private void on_panel_pref(Gtk.Action action) {
+        var panel = get_toplevel();
+        if(panel != null) {
+            // here we utilize action signal rather than
+            // calling a method of Panel, so we don't need to be linked 
+            // with the main program lxpanel.
+            GLib.Signal.emit_by_name(panel, "preferences");
+        }
+    }
+
+    bool expand = false;
+    int icon_size = 24;
+    Gtk.Orientation panel_orientation = Gtk.Orientation.HORIZONTAL;
+    Gtk.PositionType panel_position = Gtk.PositionType.BOTTOM;
+
+    private const string popup_menu_xml ="""
+    <popup>
+        <placeholder name='first'/>
+        <separator/>
+        <menuitem action='add'/>
+        <menuitem action='remove'/>
+        <menuitem action='prop'/>
+        <separator/>
+        <menuitem action='pref'/>
+        <placeholder name='last'/>
+    </popup>""";
+    const Gtk.ActionEntry[] popup_menu_actions = {
+        {"add", Gtk.Stock.ADD, N_("_Add New Applet"), null, N_("Add new applet to the panel"), on_add_new_applet},
+        {"remove", Gtk.Stock.REMOVE, null, null, N_("Remove the applet to the panel"), on_remove_applet},
+        {"prop", Gtk.Stock.PROPERTIES, null, null, N_("Properties of the applet to the panel"), on_config_applet},
+        {"pref", Gtk.Stock.PREFERENCES, N_("Panel Preferences"), null, null, on_panel_pref}
+    };
 }
 
 }

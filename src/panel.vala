@@ -20,13 +20,17 @@ enum SizeMode {
 public class Panel : Gtk.Window, Gtk.Orientable {
 
 	public Panel() {
+        // receive mouse button press event.
+        add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
+
+        // the toplevel box use to layout applets
 		box = new Gtk.Box(_orientation, 0);
 		box.show();
 		add(box);
 
         old_rect.x = old_rect.y = old_rect.width = old_rect.height = 0;
 
-		set_border_width(1);
+		set_border_width(0); // should we use 1 and paint a 3D border instead?
 		// set_app_paintable(true);
 		set_decorated(false);
 		set_deletable(false);
@@ -39,14 +43,26 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		set_resizable(false);
 		stick();
 
+        // make the panel looks like a toolbar.
 		var sc = get_style_context();
 		sc.add_class("toolbar");
-
 		screen_changed(null);
 	}
 
 	~Panel() {
 	}
+
+    // call this action signal to add a new applet
+    [Signal(action=true)]
+    public virtual signal void add_applet(Applet? current_applet) {
+        // TODO: add code showing the "Add applet" dialog.
+    }
+
+    // call this action signal to launch the preferences dialog
+    [Signal(action=true)]
+    public virtual signal void preferences() {
+        edit_preferences();
+    }
 
     // initialize multiple screen & multiple monitor support.
     private static void init_multi_monitors() {
@@ -70,6 +86,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         }
     }
 
+    // called when the panel is destroyed. may be called more than once.
 	protected override void destroy() {
         all_panels.remove(this);
         if(all_panels == null)
@@ -129,7 +146,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		}
 	}
 
-    // when the window is really created.
+    // when the window is really created by X11
     protected override void realize() {
         base.realize();
     }
@@ -165,6 +182,30 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         }
 	}
 
+    // mouse button pressed
+    protected override bool button_press_event(Gdk.EventButton evt) {
+        // Normally, the panel itself does not receive button-press-event
+        // because the mouse event are received by the applet widgets on it.
+        // However, if the applet widget has no window (GTK_NO_WINDOW flag set),
+        // we get the mouse event here. So we try to redirect the signal for the applet.
+        if(base.button_press_event != null)
+            base.button_press_event(evt);
+
+        foreach(unowned Applet applet in get_applets()) {
+            Gtk.Allocation alloc;
+            applet.get_allocation(out alloc);
+            if(evt.x >= alloc.x && evt.y >= alloc.y
+            && evt.x <= (alloc.x + alloc.width)
+            && evt.y <= (alloc.y + alloc.height)) {
+                // forward the event to the applet that has no window.
+                // FIXME: will this cause problems? coordinates might be wrong.
+                applet.button_press_event(evt);
+                break;
+            }
+        }
+        return true;
+    }
+
 	protected override bool draw(Cairo.Context cr) {
 		/*
 		var sc = get_style_context();
@@ -187,6 +228,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		return base.draw(cr);
 	}
 
+    // load an applet from a config file node.
 	private bool load_applet(GMarkupDom.Node node) {
 		var applet_type = node.get_attribute("type");
 		var applet = Applet.new_from_type_name(applet_type);
@@ -196,10 +238,10 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 				insert_applet(applet);
 			}
 		}
-
 		return true;
 	}
 
+    // load the panel from a config file node
 	public bool load_panel(GMarkupDom.Node node) {
 
 		id = node.get_attribute("id");
@@ -287,6 +329,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		return true;
 	}
 
+    // save the panel to a config file node
 	public bool save_panel(GMarkupDom.Node node) {
 		node.new_child("position", enum_to_nick<Gtk.PositionType>(position));
 		node.new_child("left_margin", left_margin.to_string());
@@ -314,6 +357,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		return true;
 	}
 
+    // insert an applet to the panel at a specified index
 	public void insert_applet(Applet applet, int index = -1) {
 		box.pack_start(applet, applet.get_expand(), true);
 		if(index >= 0)
@@ -322,25 +366,23 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         applet.set_panel_orientation(_orientation);
         applet.set_panel_position(position);
         applet.set_icon_size(icon_size);
-
 		applet.show();
 	}
 
+    // move an applet to a new position specified by index
 	public void reorder_applet(Applet applet, int index) {
 		box.reorder_child(applet, index);
 	}
 
+    // remove an applet from the panel. this caused destruction
+    // of the applet widget, unless it's referenced by others.
 	public void remove_applet(Applet applet) {
 		box.remove(applet);
 	}
 
+    // get the toplevel container box for all applets
 	public unowned Gtk.Box get_box() {
 		return box;
-	}
-
-	public unowned Wnck.Screen get_wnck_screen() {
-		int n = get_screen().get_number();
-		return Wnck.Screen.get(n);
 	}
 
     private void set_monitor(int monitor) {
@@ -578,6 +620,10 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	public List<weak Applet> get_applets() {
 		return (List<weak Applet>)box.get_children();
 	}
+
+    public static unowned List<weak Panel> get_all() {
+        return all_panels;
+    }
 
 	public unowned string? get_id() {
 		return id;

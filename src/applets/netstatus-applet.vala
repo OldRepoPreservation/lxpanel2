@@ -59,7 +59,7 @@ public class NetstatusApplet : Applet {
 		icon_tx_rx = new GLib.ThemedIcon.from_names(icon_tx_rx_names);
 	}
 
-	public virtual bool load_config(GMarkupDom.Node config_node) {
+	public override bool load_config(GMarkupDom.Node config_node) {
         base.load_config(config_node);
 		foreach(unowned GMarkupDom.Node child in config_node.children) {
 			if(child.name == "iface") {
@@ -72,8 +72,8 @@ public class NetstatusApplet : Applet {
 		}
 		return true;
 	}
-	
-	public virtual void save_config(GMarkupDom.Node config_node) {
+
+	public override void save_config(GMarkupDom.Node config_node) {
         base.save_config(config_node);
 		if(iface != null)
 			config_node.new_child("iface", iface);

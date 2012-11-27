@@ -142,7 +142,7 @@ AC_CONFIG_FILES([
     src/applets/sample/Makefile
     data/Makefile
     data/ui/Makefile
-    data/ui/about.glade
+    data/ui/about.ui
     po/Makefile.in
 ])
 

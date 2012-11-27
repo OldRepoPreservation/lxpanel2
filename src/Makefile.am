@@ -54,6 +54,7 @@ CORE_SOURCES = \
 	lxpanel2.vala \
 	panel.vala \
 	applet.vala \
+	preferences.vala \
 	button.vala \
 	menu-button.vala \
 	drawer.vala \

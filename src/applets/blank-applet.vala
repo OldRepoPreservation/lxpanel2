@@ -45,7 +45,27 @@ public class BlankApplet : Applet {
 			config_node.new_child("size", size.to_string());
         config_node.new_child("expand", get_expand().to_string());
 	}
-	
+
+    private void on_config_dlg_response(Gtk.Dialog dlg, int response) {
+        dlg.destroy();
+        config_dlg = null;
+    }
+
+    public override void edit_config(Gtk.Window? parent_window) {
+        if(config_dlg == null) {
+            var builder = new Gtk.Builder();
+            try {
+                builder.add_from_file(Config.PACKAGE_UI_DIR + "/applets/blank/pref.ui");
+                config_dlg = (Gtk.Dialog)builder.get_object("dialog");
+                config_dlg.set_transient_for(parent_window);
+                config_dlg.response.connect(on_config_dlg_response);
+            }
+            catch(Error err) {
+            }
+        }
+        config_dlg.present();
+    }
+
 	protected override void get_preferred_width(out int min, out int natral) {
 		if(size > 0 && orientation == Gtk.Orientation.HORIZONTAL)
 			min = natral = size;
@@ -69,6 +89,7 @@ public class BlankApplet : Applet {
 		return (owned)applet_info;
 	}
 	int size;
+    Gtk.Dialog? config_dlg = null;
 }
 
 }
