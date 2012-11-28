@@ -2,6 +2,7 @@ NULL=
 
 SUBDIRS= \
 	. \
+	applets/battery \
 	applets/sample \
 	$(NULL)
 
@@ -58,10 +59,10 @@ LIBLXPANEL_APPLET_SOURCES = \
 	menu-button.vala \
 	drawer.vala \
 	popup.vala \
-	upower.vala \
 	gmarkup-dom.vala \
 	utils.vala \
 	module.vala \
+	upower.vala \
 	$(LIBEGG_SOURCES) \
 	$(NULL)
 
@@ -85,7 +86,6 @@ NATRAY_SOURCES = \
 
 BUILTIN_APPLETS_SOURCES = \
 	applets/app-menu-applet.vala \
-	applets/battery-applet.vala \
 	applets/blank-applet.vala \
 	applets/clock-applet.vala \
 	applets/launchbar-applet.vala \

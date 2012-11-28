@@ -11,6 +11,7 @@ defaultconfig_DATA= \
 
 appletsdir=$(datadir)/lxpanel2/applets
 applets_in_files = \
+	applets/battery.desktop.in \
 	applets/sample.desktop.in \
 	$(NULL)
 applets_DATA = $(applets_in_files:.desktop.in=.desktop)

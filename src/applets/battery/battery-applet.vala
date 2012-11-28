@@ -19,6 +19,18 @@
 //      
 //      
 
+// NOTE: I found a bug of Vala dbus support.
+// When the dbus interface is implemented in a type module, it'll be broken.
+// Dbus iface cannot be correctly registered from a type module and can 
+// only be done in the main program. Otherwise we get this error:
+// "type_iface_ensure_dflt_vtable_Wm: assertion failed: (iface->data)"
+//
+// See here:
+// http://osdir.com/ml/vala-list/2012-09/msg00128.html
+// https://mail.gnome.org/archives/vala-list/2012-September/msg00125.html
+// I've no idea how to overcome this, so I put the dbus code in the main
+// lxpanel2 binary. :-(
+
 // This battery applet relies on UPower, which is Linux-specific
 
 namespace Lxpanel {
@@ -41,11 +53,10 @@ private class PowerDevice : Object {
 	public UPower.Device udevice;
 }
 
-
 public class BatteryApplet : Applet {
-
 	construct {
-		upower = Bus.get_proxy_sync(BusType.SYSTEM, 
+        try{
+		upower = Bus.get_proxy_sync(BusType.SYSTEM,
 									"org.freedesktop.UPower",
 									"/org/freedesktop/UPower");
 		ObjectPath[] devices = null;
@@ -56,6 +67,8 @@ public class BatteryApplet : Applet {
 		upower.device_added.connect(on_device_added);
 		upower.device_changed.connect(on_device_changed);
 		upower.device_removed.connect(on_device_removed);
+        }catch(Error err) {
+        }
 	}
 
 	public override void dispose() {
@@ -179,18 +192,20 @@ public class BatteryApplet : Applet {
 		natral_width = min_width = (int)batteries.length() * cell_width;
 	}
 
-	public static AppletInfo build_info() {
-        AppletInfo applet_info = new AppletInfo();
-        applet_info.type_id = typeof(BatteryApplet);
-		applet_info.type_name = "battery";
-		applet_info.name= _("Battery");
-		applet_info.description= _("Battery Monitor");
-        return (owned)applet_info;
-	}
-
 	UPower.UPower upower;
 	List<PowerDevice> batteries;
 	List<PowerDevice> line_powers;
 }
 
+}
+
+// called by lxpanel when loading the module
+[ModuleInit]
+public Type load(GLib.TypeModule module) {
+	// FIXME: ABI compatibility check here
+	return typeof(Lxpanel.BatteryApplet);
+}
+
+// called by lxpanel before unloading the module
+public void unload() {
 }

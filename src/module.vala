@@ -26,25 +26,27 @@ public class AppletModule : TypeModule {
     }
 
 	public override bool load() {
-		if(file != null) {
-			module = Module.open(file, ModuleFlags.BIND_LAZY);
-			if(module != null) {
-				print("module %s opened\n", file);
-				void* pfunc;
-				if(module.symbol("load", out pfunc)) {
-					LoadFunc load = (LoadFunc)pfunc;
-                    type_id = load(this);
-					if(type_id != 0) {
-						// successfully loaded
-                        return true;
-					}
-					else {
-						// failed, unload the module?
-					}
-				}
-			}
+        if(module == null) {
+            if(file != null) {
+                module = Module.open(file, ModuleFlags.BIND_LAZY);
+                if(module != null) {
+                    print("module %s opened\n", file);
+                    void* pfunc;
+                    if(module.symbol("load", out pfunc)) {
+                        LoadFunc load = (LoadFunc)pfunc;
+                        type_id = load(this);
+                        if(type_id != 0) {
+                            // successfully loaded
+                            return true;
+                        }
+                        else {
+                            // failed, unload the module?
+                        }
+                    }
+                }
+            }
 		}
-		return false;
+		return true;
 	}
 
 	public override void unload() {
@@ -67,7 +69,7 @@ public class AppletModule : TypeModule {
 
 	string? name;
 	string? file;
-	Module? module;
+	Module? module = null;
     Type type_id;
     static SList<AppletModule> all_modules;
 }

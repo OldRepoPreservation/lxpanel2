@@ -68,7 +68,7 @@ public class AppletInfo {
                 try{
                     info.version = keyfile.get_locale_string("Applet", "Copyright");
                 }catch(Error e){};
-                return info;
+                return (owned)info;
             }
             catch(Error err) {
                 print("load error: %s\n", err.message);
@@ -211,9 +211,6 @@ public class Applet : Gtk.Box {
         info = BlankApplet.build_info();
         applet_types.insert(info.type_name, (owned)info);
 
-        info = BatteryApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
         info = ClockApplet.build_info();
         applet_types.insert(info.type_name, (owned)info);
 
@@ -319,7 +316,7 @@ public class Applet : Gtk.Box {
                     else { // it's not yet added, create a new AppInfo object for it
                         info = AppletInfo.from_file(applet_id, path);
                         if(info != null) {
-                            applet_types.insert(info.type_name, info);
+                            applet_types.insert(info.type_name, (owned)info);
                         }
                     }
                 }

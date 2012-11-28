@@ -139,6 +139,7 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package.])
 AC_CONFIG_FILES([
     Makefile
     src/Makefile
+    src/applets/battery/Makefile
     src/applets/sample/Makefile
     data/Makefile
     data/ui/Makefile
