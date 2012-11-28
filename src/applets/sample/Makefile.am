@@ -3,11 +3,11 @@ NULL=
 AM_CPPFLAGS = \
 	-I$(srcdir) \
 	-I../../ \
+	-I../../lib \
 	-DPACKAGE_DATA_DIR=\""$(datadir)/lxpanel2"\" \
 	-DPACKAGE_LIB_DIR=\""$(libdir)/lxpanel2"\" \
 	-DPACKAGE_UI_DIR=\""$(datadir)/lxpanel2/ui"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
-	-DWNCK_I_KNOW_THIS_IS_UNSTABLE \
 	--include config.h \
 	$(NULL)
 # FIXME: --include config.h is not a cross-compiler solution and is gcc-only.
@@ -18,9 +18,9 @@ module_LTLIBRARIES = sample.la
 moduledir = $(libdir)/lxpanel2/applets
 
 VALAFLAGS = \
-	--pkg lxpanel2 \
+	--pkg lxpanel-applet \
 	--vapidir ../../vapi \
-	--vapidir ../../ \
+	--vapidir ../../lib \
 	--thread \
 	--disable-warnings \
 	$(NULL)
@@ -28,7 +28,6 @@ VALAFLAGS = \
 sample_la_SOURCES = \
 	sample-dynamic-applet.vala \
 	$(NULL)
-
 
 LXPANEL2_CFLAGS = \
     -Iegg \
@@ -50,6 +49,7 @@ sample_la_CFLAGS = \
 	$(NULL)
 
 sample_la_LIBADD = \
+	../../lib/liblxpanel-applet.la \
 	$(GTK_LIBS) \
 	$(INTLLIBS) \
 	$(NULL)

@@ -200,51 +200,13 @@ public class Applet : Gtk.Box {
         }
         return null;
     }
-
-    // register built-in applets
-    private static void register_builtin() {
-        // register all built-in applets
-        AppletInfo info = null;
-        info = AppMenuApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = BlankApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = ClockApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = LaunchbarApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = LogoutApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = MountsApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = NetstatusApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = PagerApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = PlacesApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = ShowDesktopApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = SysTrayApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
-
-        info = WnckTaskListApplet.build_info();
-        applet_types.insert(info.type_name, (owned)info);
+    
+    public static void register_applet_info(AppletInfo info) {
+        applet_types.insert(info.type_name, info);
     }
 
     public static void init() {
         applet_types = new HashTable<unowned string, AppletInfo>(str_hash, str_equal);
-        register_builtin(); // register built-in applets
         reload_applet_types(); // find and load dynamic applets
     }
 

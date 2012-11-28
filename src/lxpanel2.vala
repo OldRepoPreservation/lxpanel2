@@ -77,6 +77,48 @@ static void init_unix_signals() {
     });
 }
 
+// register built-in applets
+private void register_builtin_applets() {
+    // register all built-in applets
+    AppletInfo info = null;
+    info = AppMenuApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = BlankApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = ClockApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = LaunchbarApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = LogoutApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = MountsApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = NetstatusApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = PagerApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = PlacesApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = ShowDesktopApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = SysTrayApplet.build_info();
+    Applet.register_applet_info(info);
+
+    info = WnckTaskListApplet.build_info();
+    Applet.register_applet_info(info);
+}
+
+
 public int main(string[] args) {
 
     /*
@@ -90,6 +132,7 @@ public int main(string[] args) {
 	init_dbus();
     init_unix_signals();
 	Applet.init(); // initialize applets
+    register_builtin_applets();
 
 	if(profile_name == null)
 		profile_name = "default";

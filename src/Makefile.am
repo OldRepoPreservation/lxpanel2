@@ -1,7 +1,7 @@
 NULL=
 
 SUBDIRS= \
-	. \
+	lib \
 	applets/battery \
 	applets/sample \
 	$(NULL)
@@ -17,10 +17,11 @@ AM_CPPFLAGS = \
 	$(NULL)
 # FIXME: --include config.h is not a cross-compiler solution and is gcc-only.
 
+# The main program -----------------------------------------------------
+
 bin_PROGRAMS = lxpanel2
 
-VALAFLAGS = \
-	--pkg config \
+lxpanel2_VALAFLAGS = \
 	--pkg gtk+-3.0 \
 	--pkg gdk-3.0 \
     --pkg gio-2.0 \
@@ -29,45 +30,20 @@ VALAFLAGS = \
     --pkg posix \
 	--pkg libwnck-3.0 \
 	--pkg x11 \
-	--pkg eggwrapbox \
-	--pkg gtop-2.0 \
 	--pkg menu-cache \
 	--pkg na-tray \
-	--vapidir vapi \
 	--pkg config \
 	--pkg gtop-2.0 \
-	--thread \
-	--disable-warnings \
+	--pkg lxpanel-applet \
+	--vapidir vapi \
+	--vapidir lib \
 	--vapi lxpanel2.vapi \
 	--header lxpanel2.h \
-	$(NULL)
-
-#	--disable-assert
-#	--quiet
-
-# EggWrapBox from libegg
-LIBEGG_SOURCES = \
-	egg/eggwrapbox.c \
-	egg/eggwrapbox-enums.c \
-	$(NULL)
-
-# later we should make applet development related
-# files a separate library
-LIBLXPANEL_APPLET_SOURCES = \
-	applet.vala \
-	button.vala \
-	menu-button.vala \
-	drawer.vala \
-	popup.vala \
-	gmarkup-dom.vala \
-	utils.vala \
-	module.vala \
-	upower.vala \
-	$(LIBEGG_SOURCES) \
+	--thread \
+	--disable-warnings \
 	$(NULL)
 
 CORE_SOURCES = \
-	$(LIBLXPANEL_APPLET_SOURCES) \
 	lxpanel2.vala \
 	panel.vala \
 	preferences.vala \
@@ -124,6 +100,7 @@ CLEANFILES = \
 	$(NULL)
 
 lxpanel2_CFLAGS = \
+	-Ilib \
     -Iegg \
     -Iapplets/na-tray \
 	$(GTK_CFLAGS) \
@@ -138,6 +115,7 @@ lxpanel2_CFLAGS = \
 	$(NULL)
 
 lxpanel2_LDADD = \
+	lib/liblxpanel-applet.la \
 	$(GTK_LIBS) \
 	$(GIO_LIBS) \
 	$(WNCK_LIBS) \
@@ -148,16 +126,8 @@ lxpanel2_LDADD = \
 	$(INTLLIBS) \
 	$(NULL)
 
-# FIXME: using -export-dynamic to do back-linking is not portable.
-# It's better to move core lxpanel2 APIs in a separate lib.
-# See http://sources.redhat.com/autobook/autobook/autobook_172.html#SEC172
 lxpanel2_LDFLAGS = \
-	-export-dynamic \
 	$(NULL)
 
-lxpanel2_includedir = $(includedir)/lxpanel2
-lxpanel2_include_HEADERS = lxpanel2.h
-
 EXTRA_DIST = \
-	lxpanel2.deps \
 	$(NULL)

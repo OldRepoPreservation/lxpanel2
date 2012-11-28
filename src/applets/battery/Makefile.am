@@ -3,6 +3,7 @@ NULL=
 AM_CPPFLAGS = \
 	-I$(srcdir) \
 	-I../../ \
+	-I../../lib \
 	-DPACKAGE_DATA_DIR=\""$(datadir)/lxpanel2"\" \
 	-DPACKAGE_LIB_DIR=\""$(libdir)/lxpanel2"\" \
 	-DPACKAGE_UI_DIR=\""$(datadir)/lxpanel2/ui"\" \
@@ -15,9 +16,9 @@ module_LTLIBRARIES = battery.la
 moduledir = $(libdir)/lxpanel2/applets
 
 VALAFLAGS = \
-	--pkg lxpanel2 \
+	--pkg liblxpanel-applet \
 	--vapidir ../../vapi \
-	--vapidir ../../ \
+	--vapidir ../../lib \
 	--thread \
 	--disable-warnings \
 	$(NULL)
@@ -41,6 +42,7 @@ battery_la_CFLAGS = \
 	$(NULL)
 
 battery_la_LIBADD = \
+	../../lib/liblxpanel-applet.la \
 	$(GTK_LIBS) \
 	$(INTLLIBS) \
 	$(NULL)
