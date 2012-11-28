@@ -6,6 +6,7 @@ ui_DATA= \
 	about.ui \
 	preferences.ui \
 	panel-preferences.ui \
+	add-applet.ui \
 	$(NULL)
 
 # ui files for applets

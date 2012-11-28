@@ -25,7 +25,7 @@ public class SampleDynamicApplet : Applet {
 	construct {
 		var label = new Gtk.Label("Test");
 		label.show();
-		add(label);
+		pack_start(label, false, true, 0);
 	}
 }
 

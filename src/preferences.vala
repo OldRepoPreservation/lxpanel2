@@ -70,12 +70,17 @@ private void on_add_panel(Gtk.Button btn) {
 }
 
 private void on_add_applet(Gtk.Button btn) {
+    var toplevel = (Gtk.Window)btn.get_toplevel();
+    // FIXME: get curretly selected panel & applet.
+    open_add_applet_dialog(toplevel, null, 0);
 }
 
 private void on_remove(Gtk.Button btn) {
+    // remove selected panel or applet
 }
 
 private void on_pref(Gtk.Button btn) {
+    // open preference dialog for panel or applet
 }
 
 private void on_move_up(Gtk.Button btn) {
@@ -90,8 +95,11 @@ private void setup_pref_dlg(Gtk.Builder builder) {
     // the view used to show applet layout
     var applet_view = (Gtk.TreeView)builder.get_object("applet_view");
     applet_view.set_level_indentation(12);
-    applet_view.set_reorderable(true);
     
+    // The default reorder support of GtkTreeView is not suitable for
+    // our need. We need to handle Dnd ourselves later. :-(
+    // applet_view.set_reorderable(true);
+
     // create the data model for the applet view
     var applet_store = new Gtk.TreeStore(3, typeof(GLib.Icon), typeof(string), typeof(Gtk.Widget));
     setup_applet_model(applet_store);

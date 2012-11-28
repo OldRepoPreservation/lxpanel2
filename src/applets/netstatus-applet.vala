@@ -79,6 +79,14 @@ public class NetstatusApplet : Applet {
 			config_node.new_child("iface", iface);
 	}
 
+    public override void edit_config(Gtk.Window? parent_window) {
+        // TODO: configuration dialog here
+    }
+
+    public override void customize_context_menu(Gtk.UIManager ui) {
+        // TODO: add our own customize popup menu items here
+    }
+
 	public override void realize() {
 		// timeout_id = Timeout.add_seconds(1, on_timeout);
 		timeout_id = Timeout.add(500, on_timeout);

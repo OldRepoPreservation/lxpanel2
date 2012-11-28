@@ -8,25 +8,10 @@ public class AppletModule : TypeModule {
 	public AppletModule(string name, string file) {
 		this.name = name;
 		this.file = file;
-
         // GTypeModule cannot be freed, so let's add a reference for it.
         // See: http://www.lanedo.com/~mitch/module-system-talk-guadec-2006/Module-System-Talk-Guadec-2006.pdf
         all_modules.prepend(this);
 	}
-
-    public static AppletModule? from_name(string name) {
-        string base_name = @"$name.so";
-        // find in user-specific dir
-        string file_path = Path.build_filename(Environment.get_user_config_dir(), "lxpanel2/applets", base_name, null);
-        if(!FileUtils.test(file_path, FileTest.IS_REGULAR)) { // not usable
-            // find in system-wide dir instead
-            file_path = Path.build_filename(Config.PACKAGE_LIB_DIR, "applets", base_name, null);
-            if(!FileUtils.test(file_path, FileTest.IS_REGULAR)) { // not usable
-                return null;
-            }
-        }
-        return new AppletModule(name, file_path);
-    }
 
 	public unowned string? get_name() {
 		return name;
@@ -44,7 +29,7 @@ public class AppletModule : TypeModule {
 		if(file != null) {
 			module = Module.open(file, ModuleFlags.BIND_LAZY);
 			if(module != null) {
-				debug("module %s opened", file);
+				print("module %s opened\n", file);
 				void* pfunc;
 				if(module.symbol("load", out pfunc)) {
 					LoadFunc load = (LoadFunc)pfunc;
@@ -73,14 +58,11 @@ public class AppletModule : TypeModule {
 		}
 	}
 
-    public AppletInfo build_applet_info() {
-        var info = new AppletInfo();
-        if(type_id == 0)
-            load();
-        info.type_id = type_id;
-        info.type_name = this.name;
-        info.module = this;
-        return (owned)info;
+    public Type get_type_id() {
+        if(type_id == 0) { // never registered
+            load(); // really load the *.so module
+        }
+        return type_id;
     }
 
 	string? name;

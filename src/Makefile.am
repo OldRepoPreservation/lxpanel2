@@ -50,11 +50,10 @@ LIBEGG_SOURCES = \
 	egg/eggwrapbox-enums.c \
 	$(NULL)
 
-CORE_SOURCES = \
-	lxpanel2.vala \
-	panel.vala \
+# later we should make applet development related
+# files a separate library
+LIBLXPANEL_APPLET_SOURCES = \
 	applet.vala \
-	preferences.vala \
 	button.vala \
 	menu-button.vala \
 	drawer.vala \
@@ -62,9 +61,17 @@ CORE_SOURCES = \
 	upower.vala \
 	gmarkup-dom.vala \
 	utils.vala \
-	xutils.vala \
 	module.vala \
 	$(LIBEGG_SOURCES) \
+	$(NULL)
+
+CORE_SOURCES = \
+	$(LIBLXPANEL_APPLET_SOURCES) \
+	lxpanel2.vala \
+	panel.vala \
+	preferences.vala \
+	add-applet.vala \
+	xutils.vala \
 	$(NULL)
 
 # NaTray code from gnome-panel, for systray

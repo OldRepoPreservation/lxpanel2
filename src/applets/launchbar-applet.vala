@@ -57,6 +57,15 @@ public class LaunchButton : Button {
 			app = null;
 		}
 	}
+    
+    protected override bool button_press_event(Gdk.EventButton event) {
+        bool ret = base.button_press_event(event);
+        if(event.button == 3) { // right click
+            var applet = (Applet)get_parent();
+            applet.show_context_menu();
+        }
+        return ret;
+    }
 
 	private string desktop_id;
 	private string command_exec;
@@ -157,6 +166,14 @@ public class LaunchbarApplet : Applet {
 			}
 		}
 	}
+
+    public override void edit_config(Gtk.Window? parent_window) {
+        // TODO: configuration dialog here
+    }
+
+    public override void customize_context_menu(Gtk.UIManager ui) {
+        // TODO: add our own customize popup menu items here
+    }
 
 	public static AppletInfo build_info() {
         AppletInfo applet_info = new AppletInfo();

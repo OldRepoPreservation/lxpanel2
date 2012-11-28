@@ -21,14 +21,11 @@
 
 namespace Lxpanel {
 
-private HashTable<unowned string, AppletInfo> applet_types;
-private List<AppletModule> modules;
-private Quark applet_info_quark_id;
+// need to increase the number everytime the Applet API changes.
+const uint APPLET_ABI_VERSION = 1;
 
-[Compact]
 public class AppletInfo {
-    public int abi_version;
-    public Type type_id;
+    public Type type_id = 0;
     public string type_name;
     public string? name;
     public string? version;
@@ -36,31 +33,48 @@ public class AppletInfo {
     public string[] authors;
     public string? copyright;
     public bool expandable;
-    public unowned AppletModule? module; // used by dynamic applets
+    public AppletModule? module; // used by dynamic applets (always null for built-in applets)
 
     public Applet? create_new() {
         Applet applet = null;
+        if(type_id == 0) { // dynamic module is not yet loaded
+            type_id = module.get_type_id();
+        }
         if(type_id != 0)
             applet = (Applet)Object.new(type_id);
         return applet;
     }
 
-    public void load_deatils() {
-        if(name != null)
-            return;
-        // load from applet definition file
-        string base_name = @"lxpanel2/applets/$type_name.desktop";
-        var keyfile = new KeyFile();
-        try {
-            keyfile.load_from_data_dirs(base_name, null, 0);
-            name = keyfile.get_locale_string("Applet", "Name");
-            version = keyfile.get_locale_string("Applet", "Version");
-            description = keyfile.get_locale_string("Applet", "Description");
-            authors = keyfile.get_locale_string_list("Applet", "Authors");
-            version = keyfile.get_locale_string("Applet", "Copyright");
+    // load applet info from *.desktop file.
+    public static AppletInfo? from_file(string applet_id, string info_path) {
+        // check if there is an associated *.so module installed.
+        var module_path = Config.PACKAGE_LIB_DIR + @"/applets/$applet_id.so";
+        if(FileUtils.test(module_path, FileTest.IS_REGULAR)) {
+            // load the applet module info from the desktop entry file.
+            var keyfile = new KeyFile();
+            try {
+                keyfile.load_from_file(info_path, 0);
+                var info = new AppletInfo();
+                info.type_name = applet_id;
+                info.name = keyfile.get_locale_string("Applet", "Name");
+                info.module = new AppletModule(applet_id, module_path);
+                info.description = keyfile.get_locale_string("Applet", "Description");
+                try{
+                    info.version = keyfile.get_locale_string("Applet", "Version");
+                }catch(Error e){};
+                try{
+                    info.authors = keyfile.get_locale_string_list("Applet", "Authors");
+                }catch(Error e){};
+                try{
+                    info.version = keyfile.get_locale_string("Applet", "Copyright");
+                }catch(Error e){};
+                return info;
+            }
+            catch(Error err) {
+                print("load error: %s\n", err.message);
+            }
         }
-        catch(Error err) {
-        }
+        return null;
     }
 }
 
@@ -69,6 +83,10 @@ public class Applet : Gtk.Box {
 
     construct {
     }
+
+    // The following public virtual methods are aimed to be
+    // overriden by derived classes to build new applets
+    // -----------------------------------------------------------------
 
     public virtual bool get_expand() {
         // get if the applet is expandable.
@@ -127,7 +145,7 @@ public class Applet : Gtk.Box {
         // called by the panel configuration UI to launch a preference dialog.
     }
 
-    public virtual void customize_context_menu(Gtk.UIManager* ui) {
+    public virtual void customize_context_menu(Gtk.UIManager ui) {
         // called by the panel to setup the context menu prior to show it.
     }
 
@@ -146,6 +164,10 @@ public class Applet : Gtk.Box {
 
     }
 
+    // The following methods are private the the internal implementation
+    // of Lxpanel.Applet
+    // -----------------------------------------------------------------
+
     // mouse button pressed
     protected override bool button_press_event(Gdk.EventButton evt) {
         // Normally, we'll never receive this signal because the Applet class
@@ -160,28 +182,16 @@ public class Applet : Gtk.Box {
         return true;
     }
 
-    public virtual unowned AppletInfo get_info() {
-        return get_qdata<AppletInfo>(applet_info_quark_id);
+    public unowned AppletInfo get_info() {
+        return applet_info;
     }
 
     public static Applet? new_from_type_name(string type_name) {
-        unowned AppletInfo info = applet_types.lookup(type_name);
-        if(info == null) {
-            // try to load a dynamic module
-            var module = AppletModule.from_name(type_name);
-            if(module != null) {
-                // build AppletInfo from the module
-                var dynamic_info = module.build_applet_info();
-                if(dynamic_info != null) {
-                    info = dynamic_info;
-                    applet_types.insert(dynamic_info.type_name, (owned)dynamic_info);
-                }
-            }
-        }
+        var info = applet_types.lookup(type_name);
         if(info != null) {
             var applet = info.create_new();
             if(applet != null) {
-                applet.set_qdata_full(applet_info_quark_id, (void*)info, null);
+                applet.applet_info = info;
                 return applet;
             }
             else {
@@ -189,40 +199,6 @@ public class Applet : Gtk.Box {
             }
         }
         return null;
-    }
-
-    private static void register_modules_in_dir(string dirpath) {
-        try {
-            var dir = Dir.open(dirpath);
-            for(;;) { // find all *.so files in applets dir
-                var name = dir.read_name();
-                if(name == null)
-                    break;
-                var path = Path.build_filename(dirpath, name, null);
-                if(name.has_suffix(".so") && FileUtils.test(path, FileTest.IS_REGULAR)) {
-                    // a module is found, register it
-                    var type_name = name[0:-3];
-                    if(applet_types.lookup(type_name) == null) { // it's not yet added
-                        var module = new AppletModule(type_name, path);
-                        var info = module.build_applet_info();
-                        applet_types.insert(type_name, (owned)info);
-                    }
-                }
-            }
-        }
-        catch(Error err) {
-        }
-    }
-
-    private static void register_modules() {
-        // we need to detect new dynamic applet modules here
-        // load from user applet modules first
-        string dirpath = Path.build_filename(Config.PACKAGE_LIB_DIR, "applets", null);
-        register_modules_in_dir(dirpath);
-
-        // load from system applet modules
-        dirpath = Path.build_filename(Environment.get_user_config_dir(), "lxpanel2/applets", null);
-        register_modules_in_dir(dirpath);
     }
 
     // register built-in applets
@@ -271,12 +247,8 @@ public class Applet : Gtk.Box {
 
     public static void init() {
         applet_types = new HashTable<unowned string, AppletInfo>(str_hash, str_equal);
-        applet_info_quark_id = Quark.from_string("applet-info");
-        register_builtin();
-        // we do not register dynamic applets in modules here
-        // for performance reasons.
-        // we will enumerate all available modules when needed.
-        // register_modules();
+        register_builtin(); // register built-in applets
+        reload_applet_types(); // find and load dynamic applets
     }
 
     private void on_add_new_applet(Gtk.Action action) {
@@ -310,10 +282,74 @@ public class Applet : Gtk.Box {
         }
     }
 
+    // reload all available types (do not need to touch built-in applets)
+    public static void reload_applet_types() {
+        // TODO: we may check mtimes to detect changes to prevent
+        // unnecessary dir scan
+
+        // remove invalid applets modules that no longer exists
+        applet_types.foreach_remove((id, info) => {
+            if(info.module != null) { // if it's a dynamic module
+                // FIXME: should we check existance of *.desktop file instead?
+                var module_path = info.module.get_filename();
+                if(!FileUtils.test(module_path, FileTest.IS_REGULAR)) {
+                    // the module *.so file no more exist, remove the AppletInfo.
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        // reload dynamic modules info from dirs
+        var dirpath = Config.PACKAGE_DATA_DIR + "/applets";
+        try {
+            var dir = Dir.open(dirpath);
+            for(;;) { // find all *.desktop files in applets dir
+                var name = dir.read_name();
+                if(name == null || !name.has_suffix(".desktop"))
+                    break;
+                var path = Path.build_filename(dirpath, name, null);
+                if(FileUtils.test(path, FileTest.IS_REGULAR)) {
+                    // an applet module is found, register it
+                    var applet_id = name[0:-8];
+                    AppletInfo info = applet_types.lookup(applet_id);
+                    if(info != null) {
+                        // FIXME: should we reload and update applet info here?
+                    }
+                    else { // it's not yet added, create a new AppInfo object for it
+                        info = AppletInfo.from_file(applet_id, path);
+                        if(info != null) {
+                            applet_types.insert(info.type_name, info);
+                        }
+                    }
+                }
+            }
+        }
+        catch(Error err) {
+        }
+    }
+
+    // get a newly-allocated list of known Applet infos.
+    public static List<unowned AppletInfo> get_all_types() {
+        reload_applet_types(); // reload available applet info if needed
+
+        // add all known applet types to a newly-allocated list
+        List<unowned AppletInfo> list = null;
+        applet_types.foreach((key, val) => {
+            list.prepend(val);
+        });
+        // sort by name
+        list.sort((a, b) => {
+            return strcmp(a.name, b.name);
+        });
+        return (owned)list;
+    }
+
     bool expand = false;
     int icon_size = 24;
     Gtk.Orientation panel_orientation = Gtk.Orientation.HORIZONTAL;
     Gtk.PositionType panel_position = Gtk.PositionType.BOTTOM;
+    unowned AppletInfo applet_info = null;
 
     private const string popup_menu_xml ="""
     <popup>
@@ -332,6 +368,9 @@ public class Applet : Gtk.Box {
         {"prop", Gtk.Stock.PROPERTIES, null, null, N_("Properties of the applet to the panel"), on_config_applet},
         {"pref", Gtk.Stock.PREFERENCES, N_("Panel Preferences"), null, null, on_panel_pref}
     };
+
+    private static HashTable<unowned string, AppletInfo> applet_types;
+    private static List<AppletModule> modules;
 }
 
 }
