@@ -96,16 +96,24 @@ lxpanel-applet.vapi: lxpanel-applet-original.vapi
 # Add a local target to be triggered by make "all"
 #all-local: lxpanel-applet.vapi
 
+# install the vapi file
 vapifiledir=$(datadir)/vala/vapi
 vapifile_DATA = \
 	lxpanel-applet.vapi \
 	lxpanel-applet.deps \
 	$(NULL)
 
-# Workarounds to force the build
+# install a pkg-config file
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = \
+	lxpanel-applet.pc \
+	$(NULL)
+
+# Workarounds to force the build of some source files before compiling
 BUILT_SOURCES= \
 	$(NULL)
 
+# clean these files during make clean
 CLEANFILES = \
 	$(BUILT_SOURCES) \
 	lxpanel-applet.vapi \
