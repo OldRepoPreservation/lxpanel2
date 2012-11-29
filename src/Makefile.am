@@ -34,8 +34,8 @@ lxpanel2_VALAFLAGS = \
 	--pkg na-tray \
 	--pkg config \
 	--pkg gtop-2.0 \
-	--vapidir vapi \
-	--vapidir lib \
+	--vapidir=vapi \
+	--vapidir=lib \
 	--vapi lxpanel2.vapi \
 	--header lxpanel2.h \
 	--thread \
@@ -54,10 +54,15 @@ CORE_SOURCES = \
 # NaTray code from gnome-panel, for systray
 NATRAY_SOURCES = \
 	applets/na-tray/na-tray.c \
+	applets/na-tray/na-tray.h \
 	applets/na-tray/na-tray-child.c \
+	applets/na-tray/na-tray-child.h \
 	applets/na-tray/na-tray-manager.c \
+	applets/na-tray/na-tray-manager.h \
 	applets/na-tray/fixedtip.c \
+	applets/na-tray/fixedtip.h \
 	applets/na-tray/na-marshal.c \
+	applets/na-tray/na-marshal.h \
 	$(NULL)
 
 BUILTIN_APPLETS_SOURCES = \
@@ -130,4 +135,5 @@ lxpanel2_LDFLAGS = \
 	$(NULL)
 
 EXTRA_DIST = \
+	applets/na-tray/na-marshal.list \
 	$(NULL)

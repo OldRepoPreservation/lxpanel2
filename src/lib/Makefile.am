@@ -26,7 +26,7 @@ VALAFLAGS = \
     --pkg posix \
 	--pkg eggwrapbox \
 	--pkg config \
-	--vapidir ../vapi \
+	--vapidir=../vapi \
 	--verbose \
 	--thread \
 	--library lxpanel-applet \
@@ -38,7 +38,9 @@ VALAFLAGS = \
 # EggWrapBox from libegg
 LIBEGG_SOURCES = \
 	egg/eggwrapbox.c \
+	egg/eggwrapbox.h \
 	egg/eggwrapbox-enums.c \
+	egg/eggwrapbox-enums.h \
 	$(NULL)
 
 # later we should make applet development related
@@ -94,8 +96,8 @@ lxpanel-applet.vapi: lxpanel-applet-original.vapi
 # Add a local target to be triggered by make "all"
 #all-local: lxpanel-applet.vapi
 
-vapidir=$(datadir)/vala/vapi
-vapi_DATA = \
+vapifiledir=$(datadir)/vala/vapi
+vapifile_DATA = \
 	lxpanel-applet.vapi \
 	lxpanel-applet.deps \
 	$(NULL)
@@ -111,4 +113,5 @@ CLEANFILES = \
 
 EXTRA_DIST = \
 	lxpanel-applet.deps \
+	lxpanel-applet-original.vapi \
 	$(NULL)
