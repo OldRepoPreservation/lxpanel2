@@ -34,7 +34,6 @@ lxpanel2_VALAFLAGS = \
 	--pkg na-tray \
 	--pkg config \
 	--pkg gtop-2.0 \
-	--pkg lxpanel-applet \
 	--vapidir vapi \
 	--vapidir lib \
 	--vapi lxpanel2.vapi \
@@ -44,6 +43,7 @@ lxpanel2_VALAFLAGS = \
 	$(NULL)
 
 CORE_SOURCES = \
+	lib/lxpanel-applet.vapi \
 	lxpanel2.vala \
 	panel.vala \
 	preferences.vala \

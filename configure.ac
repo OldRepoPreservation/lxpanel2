@@ -15,6 +15,8 @@ AM_SILENT_RULES([yes])
 AC_PROG_CC
 AM_PROG_VALAC([0.16])
 
+AC_PROG_SED # For fixing broken vapi files
+
 #Initialize libtool
 LT_PREREQ([2.2])
 LT_INIT
