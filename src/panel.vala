@@ -9,6 +9,9 @@ namespace Pango {
 // we should report this bug to vala devs. :-(
 // extern Pango.Attribute pango_attr_font_desc_new(Pango.FontDescription desc);
 
+// defined in xutils.c
+extern void reserve_screen_space(Gdk.Window window, Gtk.PositionType position, Gdk.Rectangle? rect);
+
 namespace Lxpanel {
 
 enum SizeMode {
@@ -178,6 +181,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	protected override void size_allocate(Gtk.Allocation allocation) {
 		base.size_allocate(allocation);
         Gdk.Rectangle alloc_rect = (Gdk.Rectangle)allocation;
+        // print("alloc_rect %s: %d, %d, %d, %d\n", id, alloc_rect.x, alloc_rect.y, alloc_rect.width, alloc_rect.height);
         // we only reposition the panel if its size is really changed
         if(alloc_rect.width != old_rect.width || alloc_rect.height != old_rect.height) {
             if(length_mode == SizeMode.AUTO)
@@ -455,7 +459,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
             else
                 x = monitor_rect.x;
         }
-
         if(length_mode != SizeMode.AUTO)
             set_size_request(width, height);
 		move(x, y); // reposition the panel

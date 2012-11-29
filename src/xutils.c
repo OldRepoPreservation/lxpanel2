@@ -1,4 +1,4 @@
-//      xutils.vala
+//      xutils.c
 //      
 //      Copyright 2012 Hong Jen Yee (PCMan) <pcman.tw@gmail.com>
 //      
@@ -19,14 +19,19 @@
 //      
 //      
 
-namespace Lxpanel {
+#include <gtk/gtk.h>
+#include <gdk/gdk.h>
+
+// We implement this in plain C to workaround a bug of vala.
+// in the gdk-3.0.vapi of Vala, Gdk.property_change() is broken.
+// It use the byte counts as the value of n_elements parameters, which is incorrect.
 
 // ask the window manager to reserve the specified space for our panel window.
-void reserve_screen_space(Gdk.Window window, Gtk.PositionType position, Gdk.Rectangle? rect) {
+void reserve_screen_space(GdkWindow* window, GtkPositionType position, GdkRectangle* rect) {
     // reserve space for the panel
     // See: http://standards.freedesktop.org/wm-spec/1.3/ar01s05.html#NETWMSTRUTPARTIAL
-    Gdk.Atom _NET_WM_STRUT_PARTIAL = Gdk.Atom.intern_static_string("_NET_WM_STRUT_PARTIAL");
-    if(rect != null) {
+    GdkAtom _NET_WM_STRUT_PARTIAL = gdk_atom_intern_static_string("_NET_WM_STRUT_PARTIAL");
+    if(rect != NULL) {
         // _NET_WM_STRUT_PARTIAL data format (CARDINAL[12]/32):
         // left, right, top, bottom,
         // left_start_y, left_end_y,
@@ -34,35 +39,32 @@ void reserve_screen_space(Gdk.Window window, Gtk.PositionType position, Gdk.Rect
         // top_start_x, top_end_x,
         // bottom_start_x, bottom_end_x
 
-        ulong strut_data[12] = {0};
-
+        gulong strut_data[12] = {0};
         switch(position) {
-        case Gtk.PositionType.TOP:
-        case Gtk.PositionType.BOTTOM:
-            strut_data[position] = rect.height;
-            strut_data[4 + position * 2] = rect.x;
-            strut_data[4 + position * 2 + 1] = rect.x + rect.width - 1;
+        case GTK_POS_TOP:
+        case GTK_POS_BOTTOM:
+            // g_print("pos: %d, %d,%d,%d,%d\n", (int)position, rect->x, rect->y, rect->width, rect->height);
+            strut_data[position] = rect->height;
+            strut_data[4 + position * 2] = rect->x;
+            strut_data[4 + position * 2 + 1] = rect->x + rect->width - 1;
             // -1 is needed here. otherwise, some window managers will
             // also reserve the space for the adjacent monitor.
             // openbox is one of these window managers
             break;
-        case Gtk.PositionType.LEFT:
-        case Gtk.PositionType.RIGHT:
-            strut_data[position] = rect.width;
-            strut_data[4 + position * 2] = rect.y;
-            strut_data[4 + position * 2 + 1] = rect.y + rect.height - 1;
+        case GTK_POS_LEFT:
+        case GTK_POS_RIGHT:
+            strut_data[position] = rect->width;
+            strut_data[4 + position * 2] = rect->y;
+            strut_data[4 + position * 2 + 1] = rect->y + rect->height - 1;
             // -1 is needed here. otherwise, some window managers will
             // also reserve the space for the adjacent monitor.
             break;
         }
-
-        Gdk.property_change(window, _NET_WM_STRUT_PARTIAL,
-            Gdk.Atom.intern_static_string("CARDINAL"), 32,
-            Gdk.PropMode.REPLACE, (uchar[])strut_data);
+        gdk_property_change(window, _NET_WM_STRUT_PARTIAL,
+            gdk_atom_intern_static_string("CARDINAL"), 32,
+            GDK_PROP_MODE_REPLACE, (const char*)strut_data, G_N_ELEMENTS(strut_data));
     }
     else { // remove it
-        Gdk.property_delete(window, _NET_WM_STRUT_PARTIAL);
+        gdk_property_delete(window, _NET_WM_STRUT_PARTIAL);
     }
-}
-
 }

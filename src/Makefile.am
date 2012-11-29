@@ -47,7 +47,7 @@ CORE_SOURCES = \
 	panel.vala \
 	preferences.vala \
 	add-applet.vala \
-	xutils.vala \
+	xutils.c \
 	$(NULL)
 
 # NaTray code from gnome-panel, for systray
