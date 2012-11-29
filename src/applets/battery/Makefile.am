@@ -16,9 +16,9 @@ module_LTLIBRARIES = battery.la
 moduledir = $(libdir)/lxpanel2/applets
 
 VALAFLAGS = \
-	--pkg liblxpanel2-applet \
-	--vapidir ../../vapi \
-	--vapidir ../../lib \
+	--pkg lxpanel2-applet \
+	--vapidir=../../vapi \
+	--vapidir=../../lib \
 	--thread \
 	--disable-warnings \
 	$(NULL)

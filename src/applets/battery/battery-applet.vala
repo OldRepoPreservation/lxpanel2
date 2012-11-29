@@ -174,7 +174,8 @@ public class BatteryApplet : Applet {
 		cr.restore();
 		return true;
 	}
-	
+
+    // currently, using width_for_height/height_for_width is broken
 	protected override Gtk.SizeRequestMode get_request_mode() {
 		Gtk.SizeRequestMode mode;
 		/*
@@ -183,14 +184,30 @@ public class BatteryApplet : Applet {
 		else
 			mode = Gtk.SizeRequestMode.HEIGHT_FOR_WIDTH;
 		*/
-		mode = Gtk.SizeRequestMode.WIDTH_FOR_HEIGHT;
+		mode = Gtk.SizeRequestMode.CONSTANT_SIZE;
 		return mode;
 	}
-	
+
+    /*
 	protected override void get_preferred_width_for_height(int height, out int min_width, out int natral_width) {
-		int cell_width = (height / 4);
-		natral_width = min_width = (int)batteries.length() * cell_width;
+		//int cell_width = (height / 1);
+		//natral_width = min_width = (int)batteries.length() * cell_width;
 	}
+    */
+
+    protected override void get_preferred_width(out int min, out int natural) {
+        if(get_panel_orientation() == Gtk.Orientation.HORIZONTAL)
+            min = natural = get_icon_size() / 3;
+        else
+            base.get_preferred_width(out min, out natural);
+    }
+
+    protected override void get_preferred_height(out int min, out int natural) {
+        if(get_panel_orientation() == Gtk.Orientation.VERTICAL)
+            base.get_preferred_height(out min, out natural);
+        else
+            min = natural = get_icon_size() / 3;
+    }
 
 	UPower.UPower upower;
 	List<PowerDevice> batteries;
