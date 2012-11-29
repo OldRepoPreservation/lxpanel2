@@ -7,7 +7,7 @@ namespace Pango {
 
 // FIXME: temporary hack! vala does not have this API in pango vapi.
 // we should report this bug to vala devs. :-(
-extern Pango.Attribute pango_attr_font_desc_new(Pango.FontDescription desc);
+// extern Pango.Attribute pango_attr_font_desc_new(Pango.FontDescription desc);
 
 namespace Lxpanel {
 
