@@ -3,6 +3,13 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
+topdatadir=@datadir@/lxpanel2
+toplibdir=${libdir}/lxpanel2
+
+moduledir=${toplibdir}/applets
+infodir=${topdatadir}/applets
+uidir=${topdatadir}/ui/applets
+
 Name: lxpanel-applet
 Description: A library used for lxpanel applet development
 Requires: gtk+-3.0 glib-2.0 gthread-2.0 gio-unix-2.0

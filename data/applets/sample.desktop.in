@@ -1,6 +1,0 @@
-[Applet]
-Name=Sample
-Version=0.1
-Description=Sample plugin demonstrating lxpanel dynamic applet module
-Authors=PCMan;
-Copyright=GNU GPL

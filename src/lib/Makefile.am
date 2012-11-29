@@ -83,7 +83,11 @@ liblxpanel2_applet_la_LDFLAGS = \
 	$(NULL)
 
 liblxpanel2_applet_la_includedir = $(includedir)/lxpanel2
-liblxpanel2_applet_la_include_HEADERS = lxpanel2-applet.h
+liblxpanel2_applet_la_include_HEADERS = \
+	lxpanel2-applet.h \
+	egg/eggwrapbox.h \
+	egg/eggwrapbox-enums.h \
+	$(NULL)
 
 # install the vapi file
 vapifiledir=$(datadir)/vala/vapi
