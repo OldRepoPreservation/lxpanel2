@@ -33,7 +33,7 @@ static const OptionEntry[] option_entries = {
 
 
 [DBus (name = "org.lxde.Lxpanel")]
-public class Lxpanel : Object {
+public class Application : Object {
 
 	// show "Run" dialog
 	public void run() {
@@ -61,7 +61,7 @@ private void init_dbus() {
 	Bus.own_name (BusType.SESSION, "org.lxde.Lxpanel", BusNameOwnerFlags.NONE,
 		(conn) => { // bus acquired
 			try {
-				conn.register_object ("/org/lxde/Lxpanel", new Lxpanel());
+				conn.register_object ("/org/lxde/Lxpanel", new Application());
 			} catch (IOError e) {
 				stderr.printf ("Could not register service\n");
 			}
