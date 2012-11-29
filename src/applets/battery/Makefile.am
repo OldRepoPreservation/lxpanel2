@@ -16,7 +16,7 @@ module_LTLIBRARIES = battery.la
 moduledir = $(libdir)/lxpanel2/applets
 
 VALAFLAGS = \
-	--pkg liblxpanel-applet \
+	--pkg liblxpanel2-applet \
 	--vapidir ../../vapi \
 	--vapidir ../../lib \
 	--thread \
@@ -42,7 +42,7 @@ battery_la_CFLAGS = \
 	$(NULL)
 
 battery_la_LIBADD = \
-	../../lib/liblxpanel-applet.la \
+	../../lib/liblxpanel2-applet.la \
 	$(GTK_LIBS) \
 	$(INTLLIBS) \
 	$(NULL)

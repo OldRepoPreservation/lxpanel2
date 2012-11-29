@@ -15,7 +15,7 @@ AM_CPPFLAGS = \
 
 # The library for applet development -----------------------------------
 
-lib_LTLIBRARIES=liblxpanel-applet.la
+lib_LTLIBRARIES=liblxpanel2-applet.la
 
 VALAFLAGS = \
 	--pkg gtk+-3.0 \
@@ -24,14 +24,14 @@ VALAFLAGS = \
     --pkg gio-unix-2.0 \
     --pkg gmodule-2.0 \
     --pkg posix \
-	--pkg eggwrapbox \
+	--pkg lxpanel2-eggwrapbox \
 	--pkg config \
 	--vapidir=../vapi \
 	--verbose \
 	--thread \
-	--library lxpanel-applet \
-	--header lxpanel-applet.h \
-	--vapi lxpanel-applet.vapi \
+	--library lxpanel2-applet \
+	--header lxpanel2-applet.h \
+	--vapi lxpanel2-applet.vapi \
 	--disable-warnings \
 	$(NULL)
 
@@ -45,7 +45,7 @@ LIBEGG_SOURCES = \
 
 # later we should make applet development related
 # files a separate library
-liblxpanel_applet_la_SOURCES = \
+liblxpanel2_applet_la_SOURCES = \
 	applet.vala \
 	button.vala \
 	menu-button.vala \
@@ -58,7 +58,7 @@ liblxpanel_applet_la_SOURCES = \
 	$(LIBEGG_SOURCES) \
 	$(NULL)
 
-liblxpanel_applet_la_CFLAGS = \
+liblxpanel2_applet_la_CFLAGS = \
     -Iegg \
 	$(GTK_CFLAGS) \
 	$(GIO_CFLAGS) \
@@ -73,29 +73,30 @@ liblxpanel_applet_la_CFLAGS = \
 	-shared \
 	$(NULL)
 
-liblxpanel_applet_la_LIBADD = \
+liblxpanel2_applet_la_LIBADD = \
 	$(GTK_LIBS) \
 	$(INTLLIBS) \
 	$(NULL)
 
-liblxpanel_applet_la_LDFLAGS = \
+liblxpanel2_applet_la_LDFLAGS = \
 	-export-dynamic \
 	$(NULL)
 
-liblxpanel_applet_la_includedir = $(includedir)/lxpanel2
-liblxpanel_applet_la_include_HEADERS = lxpanel-applet.h
+liblxpanel2_applet_la_includedir = $(includedir)/lxpanel2
+liblxpanel2_applet_la_include_HEADERS = lxpanel2-applet.h
 
 # install the vapi file
 vapifiledir=$(datadir)/vala/vapi
 vapifile_DATA = \
-	lxpanel-applet.vapi \
-	lxpanel-applet.deps \
+	lxpanel2-applet.vapi \
+	lxpanel2-applet.deps \
+	../vapi/lxpanel2-eggwrapbox.vapi \
 	$(NULL)
 
 # install a pkg-config file
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = \
-	lxpanel-applet.pc \
+	lxpanel2-applet.pc \
 	$(NULL)
 
 # Workarounds to force the build of some source files before compiling
@@ -105,9 +106,9 @@ BUILT_SOURCES= \
 # clean these files during make clean
 CLEANFILES = \
 	$(BUILT_SOURCES) \
-	lxpanel-applet.vapi \
+	lxpanel2-applet.vapi \
 	$(NULL)
 
 EXTRA_DIST = \
-	lxpanel-applet.deps \
+	lxpanel2-applet.deps \
 	$(NULL)

@@ -142,9 +142,8 @@ AC_CONFIG_FILES([
     Makefile
     src/Makefile
     src/lib/Makefile
-    src/lib/lxpanel-applet.pc
+    src/lib/lxpanel2-applet.pc
     src/applets/battery/Makefile
-    src/applets/sample/Makefile
     data/Makefile
     data/ui/Makefile
     data/ui/about.ui

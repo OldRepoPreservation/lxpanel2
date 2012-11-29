@@ -3,7 +3,6 @@ NULL=
 SUBDIRS= \
 	lib \
 	applets/battery \
-	applets/sample \
 	$(NULL)
 
 AM_CPPFLAGS = \
@@ -34,6 +33,7 @@ lxpanel2_VALAFLAGS = \
 	--pkg na-tray \
 	--pkg config \
 	--pkg gtop-2.0 \
+	--pkg lxpanel2-applet \
 	--vapidir=vapi \
 	--vapidir=lib \
 	--vapi lxpanel2.vapi \
@@ -43,7 +43,6 @@ lxpanel2_VALAFLAGS = \
 	$(NULL)
 
 CORE_SOURCES = \
-	lib/lxpanel-applet.vapi \
 	lxpanel2.vala \
 	panel.vala \
 	preferences.vala \
@@ -120,7 +119,7 @@ lxpanel2_CFLAGS = \
 	$(NULL)
 
 lxpanel2_LDADD = \
-	lib/liblxpanel-applet.la \
+	lib/liblxpanel2-applet.la \
 	$(GTK_LIBS) \
 	$(GIO_LIBS) \
 	$(WNCK_LIBS) \
