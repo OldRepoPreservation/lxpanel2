@@ -55,7 +55,7 @@ public class BlankApplet : Applet {
         if(config_dlg == null) {
             var builder = new Gtk.Builder();
             try {
-                builder.add_from_file(Config.PACKAGE_UI_DIR + "/applets/blank/pref.ui");
+                builder.add_from_file(Config.PACKAGE_DATA_DIR + "/applet-data/blank/ui/pref.ui");
                 config_dlg = (Gtk.Dialog)builder.get_object("dialog");
                 config_dlg.set_transient_for(parent_window);
                 config_dlg.response.connect(on_config_dlg_response);

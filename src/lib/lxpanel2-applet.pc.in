@@ -8,7 +8,7 @@ toplibdir=${libdir}/lxpanel2
 
 moduledir=${toplibdir}/applets
 infodir=${topdatadir}/applets
-uidir=${topdatadir}/ui/applets
+appletdatadir=${topdatadir}/applet-data
 
 Name: lxpanel-applet
 Description: A library used for lxpanel applet development

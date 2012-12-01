@@ -72,7 +72,7 @@ private void on_add_panel(Gtk.Button btn) {
 private void on_add_applet(Gtk.Button btn) {
     var toplevel = (Gtk.Window)btn.get_toplevel();
     // FIXME: get curretly selected panel & applet.
-    open_add_applet_dialog(toplevel, null, 0);
+    new AddAppletDialog(toplevel, null, 0);
 }
 
 private void on_remove(Gtk.Button btn) {

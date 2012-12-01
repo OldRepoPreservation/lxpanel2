@@ -40,8 +40,12 @@ public class AppletInfo {
         if(type_id == 0) { // dynamic module is not yet loaded
             type_id = module.get_type_id();
         }
-        if(type_id != 0)
+        if(type_id != 0) {
             applet = (Applet)Object.new(type_id);
+            if(applet != null) {
+                applet.set_info(this);
+            }
+        }
         return applet;
     }
 
@@ -184,6 +188,10 @@ public class Applet : Gtk.Box {
 
     public unowned AppletInfo get_info() {
         return applet_info;
+    }
+
+    public void set_info(AppletInfo info) {
+        applet_info = info;
     }
 
     public static Applet? new_from_type_name(string type_name) {

@@ -147,6 +147,7 @@ AC_CONFIG_FILES([
     data/Makefile
     data/ui/Makefile
     data/ui/about.ui
+    data/applet-data/Makefile
     po/Makefile.in
 ])
 

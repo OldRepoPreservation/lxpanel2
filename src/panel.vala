@@ -61,7 +61,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         // TODO: add code showing the "Add applet" dialog.
         int pos = get_applets().index(current_applet);
         if(pos != -1)
-            open_add_applet_dialog(null, this, pos);
+            new AddAppletDialog(null, this, pos);
     }
 
     // call this action signal to launch the preferences dialog

@@ -2,6 +2,7 @@ NULL=
 
 SUBDIRS= \
 	ui \
+	applet-data \
 	$(NULL)
 
 defaultconfigdir=$(sysconfdir)/xdg/lxpanel2/default
