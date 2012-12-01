@@ -1,16 +1,16 @@
 namespace Lxpanel {
+    
+// need to increase the number everytime the Applet API changes.
+public const uint APPLET_ABI_VERSION = 1;
 
-public class AppletModule : TypeModule {
+public class AppletModule : Object {
 
-	delegate Type LoadFunc(TypeModule module);
+	delegate Type LoadFunc(uint abi_version);
 	delegate void UnloadFunc();
 
 	public AppletModule(string name, string file) {
 		this.name = name;
 		this.file = file;
-        // GTypeModule cannot be freed, so let's add a reference for it.
-        // See: http://www.lanedo.com/~mitch/module-system-talk-guadec-2006/Module-System-Talk-Guadec-2006.pdf
-        all_modules.prepend(this);
 	}
 
 	public unowned string? get_name() {
@@ -25,7 +25,7 @@ public class AppletModule : TypeModule {
         return module != null;
     }
 
-	public override bool load() {
+	public bool load() {
         if(module == null) {
             if(file != null) {
                 module = Module.open(file, ModuleFlags.BIND_LAZY);
@@ -34,7 +34,7 @@ public class AppletModule : TypeModule {
                     void* pfunc;
                     if(module.symbol("load", out pfunc)) {
                         LoadFunc load = (LoadFunc)pfunc;
-                        type_id = load(this);
+                        type_id = load(APPLET_ABI_VERSION);
                         if(type_id != 0) {
                             // successfully loaded
                             return true;
@@ -49,7 +49,7 @@ public class AppletModule : TypeModule {
 		return true;
 	}
 
-	public override void unload() {
+	public void unload() {
 		if(module != null) {
 			void* pfunc;
 			if(module.symbol("unload", out pfunc)) {
@@ -71,7 +71,6 @@ public class AppletModule : TypeModule {
 	string? file;
 	Module? module = null;
     Type type_id;
-    static SList<AppletModule> all_modules;
 }
 
 }

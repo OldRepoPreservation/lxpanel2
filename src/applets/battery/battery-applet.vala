@@ -217,9 +217,10 @@ public class BatteryApplet : Applet {
 }
 
 // called by lxpanel when loading the module
-[ModuleInit]
-public Type load(GLib.TypeModule module) {
-	// FIXME: ABI compatibility check here
+public Type load(uint abi_version) {
+	// ABI compatibility check here
+    if(abi_version != Lxpanel.APPLET_ABI_VERSION)
+        return 0;
 	return typeof(Lxpanel.BatteryApplet);
 }
 

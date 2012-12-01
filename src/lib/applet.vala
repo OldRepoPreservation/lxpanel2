@@ -21,9 +21,6 @@
 
 namespace Lxpanel {
 
-// need to increase the number everytime the Applet API changes.
-const uint APPLET_ABI_VERSION = 1;
-
 public class AppletInfo {
     public Type type_id = 0;
     public string type_name;
