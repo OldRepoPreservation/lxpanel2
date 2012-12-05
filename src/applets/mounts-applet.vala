@@ -64,6 +64,7 @@ public class MountsApplet : Applet {
 			menu.destroy();
 			menu = null;
 		}
+        base.dispose();
 	}
 
 	private unowned Gtk.ImageMenuItem? find_item_by_volume(Volume volume) {

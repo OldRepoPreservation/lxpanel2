@@ -21,7 +21,7 @@
 
 namespace Lxpanel {
 
-public class AppletInfo {
+public class AppletInfo : Object {
     public Type type_id = 0;
     public string type_name;
     public string? name;
@@ -221,12 +221,18 @@ public class Applet : Gtk.Box {
             // here we utilize action signal rather than
             // calling a method of Panel, so we don't need to be linked 
             // with the main program lxpanel.
-            GLib.Signal.emit_by_name(panel, "add_applet", this);
+            GLib.Signal.emit_by_name(panel, "add_applet_action", this);
         }
     }
 
     private void on_remove_applet(Gtk.Action action) {
-        destroy();
+        var panel = get_toplevel();
+        if(panel != null) {
+            // here we utilize action signal rather than
+            // calling a method of Panel, so we don't need to be linked 
+            // with the main program lxpanel.
+            GLib.Signal.emit_by_name(panel, "remove_applet_action", this);
+        }
         // TODO: if the applet is in a dynamic module, and
         // we released the last references of the applet class,
         // unload the dynamic module to save memory.

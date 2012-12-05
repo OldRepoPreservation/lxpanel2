@@ -19,7 +19,20 @@ public class ClockApplet : Applet {
 			Source.remove(timeout);
 			timeout = 0;
 		}
+        base.dispose();
 	}
+
+    /*
+    protected override bool button_press_event(Gdk.EventButton evt) {
+        var popup = new Popup();
+        popup.ref();
+        var calendar = new Gtk.Calendar();
+        calendar.show();
+        popup.add(calendar);
+        popup.popup(null, evt.button, evt.time);
+        return true;
+    }
+    */
 
 	private bool on_timeout() {
 		var _time = time_t();

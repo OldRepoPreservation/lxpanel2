@@ -56,17 +56,17 @@ private class PowerDevice : Object {
 public class BatteryApplet : Applet {
 	construct {
         try{
-		upower = Bus.get_proxy_sync(BusType.SYSTEM,
-									"org.freedesktop.UPower",
-									"/org/freedesktop/UPower");
-		ObjectPath[] devices = null;
-		upower.enumerate_devices(out devices);
-		foreach(unowned ObjectPath device in devices) {
-			on_device_added(device);
-		}
-		upower.device_added.connect(on_device_added);
-		upower.device_changed.connect(on_device_changed);
-		upower.device_removed.connect(on_device_removed);
+            upower = Bus.get_proxy_sync(BusType.SYSTEM,
+                                        "org.freedesktop.UPower",
+                                        "/org/freedesktop/UPower");
+            ObjectPath[] devices = null;
+            upower.enumerate_devices(out devices);
+            foreach(unowned ObjectPath device in devices) {
+                on_device_added(device);
+            }
+            upower.device_added.connect(on_device_added);
+            upower.device_changed.connect(on_device_changed);
+            upower.device_removed.connect(on_device_removed);
         }catch(Error err) {
         }
 	}
@@ -84,6 +84,7 @@ public class BatteryApplet : Applet {
 		if(line_powers != null) {
 			line_powers = null;
 		}
+        base.dispose();
 	}
 
 	private void on_device_added(ObjectPath device_path) {

@@ -48,6 +48,7 @@ public class AppMenuApplet : Applet {
 			menu_cache_reload_notify = null;
 			menu_cache = null;
 		}
+        base.dispose();
 	}
 
 	private void add_menu_items(Gtk.Menu menu, MenuCache.Dir dir) {

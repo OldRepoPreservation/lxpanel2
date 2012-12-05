@@ -119,4 +119,37 @@ public string locate_theme_dir(string theme_name) {
     return null;
 }
 
+// with GtkBuilder + glade, normally, you can only use gtk built-in
+// widgets unless you create modules in glade for your custom widgets.
+// This function replaces GtkWindow, GtkDialog, or other gtk built-in
+// widget with your derived one inside the GtkBuilder xml definition
+// and load it. So you can have a derived widget class instead.
+public Gtk.Widget? derived_widget_from_gtk_builder(
+    string filename, string object_id,
+    Type parent_type, Type drived_type, out Gtk.Builder builder) {
+    Gtk.Widget widget = null;
+    try {
+        builder = new Gtk.Builder();
+        string xml;
+        // load the content of the gtkbuilder ui file into a string first.
+        FileUtils.get_contents(filename, out xml);
+        // find our target widget, and replace its class name with
+        // our derived class
+
+        // FIXME: these string operations are inefficient in vala. Let's optimize it later.
+        // replace some xml code, mainly to replace the class name with ours.
+        string old_xml = "<object class=\"" + parent_type.name() + "\" id=\"" + object_id + "\">";
+        string new_xml = "<object class=\"" + drived_type.name() +"\" id=\"" + object_id + "\">";
+        xml = xml.replace(old_xml, new_xml);
+
+        // ask GtkBuilder to load the xml ui definition.
+        builder.add_from_string(xml, -1);
+        widget = (Gtk.Widget)builder.get_object(object_id);
+    }
+    catch(Error err) {
+        print("%s\n", err.message);
+    }
+    return widget;
+}
+
 }

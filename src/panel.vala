@@ -1,13 +1,23 @@
-/*
-namespace Pango {
-	[CCode (cheader_filename = "pango/pango.h")]
-	public static Pango.Attribute attr_font_desc_new(Pango.FontDescription desc);
-}
-*/
-
-// FIXME: temporary hack! vala does not have this API in pango vapi.
-// we should report this bug to vala devs. :-(
-// extern Pango.Attribute pango_attr_font_desc_new(Pango.FontDescription desc);
+//      panel.vala
+//      
+//      Copyright 2011-2012 Hong Jen Yee (PCMan) <pcman.tw@gmail.com>
+//      
+//      This program is free software; you can redistribute it and/or modify
+//      it under the terms of the GNU General Public License as published by
+//      the Free Software Foundation; either version 2 of the License, or
+//      (at your option) any later version.
+//      
+//      This program is distributed in the hope that it will be useful,
+//      but WITHOUT ANY WARRANTY; without even the implied warranty of
+//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//      GNU General Public License for more details.
+//      
+//      You should have received a copy of the GNU General Public License
+//      along with this program; if not, write to the Free Software
+//      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+//      MA 02110-1301, USA.
+//      
+//    
 
 // defined in xutils.c
 extern void reserve_screen_space(Gdk.Window window, Gtk.PositionType position, Gdk.Rectangle? rect);
@@ -57,11 +67,21 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
     // call this action signal to add a new applet
     [Signal(action=true)]
-    public virtual signal void add_applet(Applet? current_applet) {
-        // TODO: add code showing the "Add applet" dialog.
+    public virtual signal void add_applet_action(Applet? current_applet) {
+        // show the "Add applet" dialog.
         int pos = get_applets().index(current_applet);
-        if(pos != -1)
-            new AddAppletDialog(null, this, pos);
+        if(pos != -1) {
+            var applet = choose_new_applet(null, this);
+            if(applet != null) {
+                insert_applet(applet, pos);
+            }
+        }
+    }
+
+    // call this action signal to remove an existing applet
+    [Signal(action=true)]
+    public virtual signal void remove_applet_action(Applet? current_applet) {
+        remove_applet(current_applet);
     }
 
     // call this action signal to launch the preferences dialog
@@ -69,6 +89,16 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     public virtual signal void preferences() {
         edit_preferences();
     }
+
+    // an applet is added to the panel
+    public signal void applet_added(Applet applet, int pos);
+
+    // an applet is removed from the panel
+    public signal void applet_removed(Applet applet, int pos);
+
+    // an applet is reordered
+    public signal void applet_reordered(Applet applet, int new_pos);
+
 
     // initialize multiple screen & multiple monitor support.
     private static void init_multi_monitors() {
@@ -374,17 +404,24 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         applet.set_panel_position(position);
         applet.set_icon_size(icon_size);
 		applet.show();
+
+        applet_added(applet, index); // emit a signal
 	}
 
     // move an applet to a new position specified by index
-	public void reorder_applet(Applet applet, int index) {
-		box.reorder_child(applet, index);
+	public void reorder_applet(Applet applet, int new_pos) {
+		box.reorder_child(applet, new_pos);
+        applet_reordered(applet, new_pos); // emit a signal
 	}
 
     // remove an applet from the panel. this caused destruction
     // of the applet widget, unless it's referenced by others.
 	public void remove_applet(Applet applet) {
-		box.remove(applet);
+        int pos = get_applets().index(applet);
+        if(pos != -1) {
+            box.remove(applet);
+            applet_removed(applet, pos); // emit a signal
+        }
 	}
 
     // get the toplevel container box for all applets

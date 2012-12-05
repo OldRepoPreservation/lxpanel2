@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkListStore" id="applet_store">
-    <columns>
-      <!-- column-name icon -->
-      <column type="GObject"/>
-      <!-- column-name name -->
-      <column type="gchararray"/>
-      <!-- column-name desc -->
-      <column type="gchararray"/>
-      <!-- column-name info -->
-      <column type="gpointer"/>
-    </columns>
-  </object>
   <object class="GtkDialog" id="dialog">
     <property name="can_focus">False</property>
     <property name="border_width">10</property>
@@ -86,7 +74,6 @@
               <object class="GtkTreeView" id="applet_view">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="model">applet_store</property>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection" id="treeview-selection1"/>
                 </child>
@@ -95,9 +82,6 @@
                     <property name="title" translatable="yes">Name</property>
                     <child>
                       <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1"/>
-                      <attributes>
-                        <attribute name="pixbuf">0</attribute>
-                      </attributes>
                     </child>
                     <child>
                       <object class="GtkCellRendererText" id="cellrenderertext1"/>
