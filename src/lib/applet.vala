@@ -98,6 +98,11 @@ public class Applet : Gtk.Box {
     public virtual void set_expand(bool expand) {
         // set the applet expandable.
         this.expand = expand;
+        var parent = (Gtk.Box)get_parent();
+        if(parent != null) {
+            // this is a little bit dirty but works well
+            parent.set_child_packing(this, expand, true, 0, Gtk.PackType.START);
+        }
     }
 
     public virtual void set_panel_orientation(Gtk.Orientation orientation) {

@@ -51,12 +51,26 @@ public class BlankApplet : Applet {
         config_dlg = null;
     }
 
+    private void on_expand_toggled(Gtk.ToggleButton btn) {
+        set_expand(btn.get_active());
+    }
+
+    private void on_size_value_changed(Gtk.SpinButton btn) {
+        
+    }
+
     public override void edit_config(Gtk.Window? parent_window) {
         if(config_dlg == null) {
             var builder = new Gtk.Builder();
             try {
                 builder.add_from_file(Config.PACKAGE_DATA_DIR + "/applet-data/blank/ui/pref.ui");
                 config_dlg = (Gtk.Dialog)builder.get_object("dialog");
+                var expand_btn = (Gtk.CheckButton)builder.get_object("expand_btn");
+                expand_btn.set_active(get_expand());
+                expand_btn.toggled.connect(on_expand_toggled);
+                var size_spin = (Gtk.SpinButton)builder.get_object("size_spin");
+                size_spin.set_value(size);
+                size_spin.value_changed.connect(on_size_value_changed);
                 config_dlg.set_transient_for(parent_window);
                 config_dlg.response.connect(on_config_dlg_response);
             }
