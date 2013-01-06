@@ -35,6 +35,11 @@ class AppletChooserDialog : Gtk.Dialog {
         if(parent_win != null)
             set_transient_for(parent_win);
 
+		// glade does not support "gicon" attribute yet. set it manually
+		var name_col = (Gtk.TreeViewColumn)builder.get_object("name_column");
+		var icon_renderer = (Gtk.CellRendererPixbuf)builder.get_object("icon_renderer");
+		name_col.add_attribute(icon_renderer, "gicon", 0);
+
         load_applets_list(builder);
     }
 
@@ -59,9 +64,8 @@ class AppletChooserDialog : Gtk.Dialog {
         var applet_infos = Applet.get_all_types();
         foreach(unowned AppletInfo info in applet_infos) {
             store.append(out iter);
-            GLib.Icon icon = null;
             store.set(iter,
-                0, icon,
+                0, info.icon,
                 1, info.name,
                 2, info.description,
                 3, info,
@@ -89,11 +93,12 @@ public Applet choose_new_applet(Gtk.Window? parent_window, Panel panel) {
                     out builder);
     if(dlg != null) {
         dlg.setup_ui(parent_window, panel, builder);
-        dlg.run();
-        var info = dlg.get_selected();
-        if(info != null) {
-            applet = info.create_new();
-        }
+        if(dlg.run() == Gtk.ResponseType.OK) {
+			var info = dlg.get_selected();
+			if(info != null) {
+				applet = info.create_new();
+			}
+		}
         dlg.destroy();
     }
     return applet;

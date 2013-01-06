@@ -24,7 +24,7 @@ extern void reserve_screen_space(Gdk.Window window, Gtk.PositionType position, G
 
 namespace Lxpanel {
 
-enum SizeMode {
+public enum SizeMode {
     AUTO,
     PERCENT,
     PIXEL
@@ -87,7 +87,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     // call this action signal to launch the preferences dialog
     [Signal(action=true)]
     public virtual signal void preferences() {
-        edit_preferences();
+        edit_preferences(this);
     }
 
     // an applet is added to the panel
@@ -294,7 +294,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 			else if(child.name == "position") {
 				// position = (Gtk.PositionType)int.parse(child.val);
 				position = enum_nick_parse<Gtk.PositionType>(child.val);
-                set_position(position);
+                set_position(position, true);
 			}
 			else if(child.name == "reserve_space") {
 				reserve_space = bool.parse(child.val);
@@ -334,16 +334,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 			}
 			else if(child.name == "bottom_margin") {
 				bottom_margin = int.parse(child.val);
-			}
-			else if(child.name == "text_color") {
-				text_color = (owned)child.val;
-				if(text_color != null) {
-				}
-			}
-			else if(child.name == "font") {
-				font_desc = (owned)child.val;
-				if(font_desc != null) {
-				}
 			}
             else if(child.name == "monitor") {
                 set_monitor(int.parse(child.val));
@@ -429,13 +419,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		return box;
 	}
 
-    private void set_monitor(int monitor) {
-        if(this.monitor != monitor) {
-            this.monitor = monitor;
-            update_geometry();
-        }
-    }
-
     // resize and reposition the panel according to current monitor size.
 	public void update_geometry() {
         // If length_mode is SizeMode.AUTO, the length of the panel is
@@ -514,31 +497,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
                     applet.set_panel_orientation(orientation);
                 }
             }
-		}
-	}
-
-	public Gtk.PositionType get_position() {
-		return position;
-	}
-	
-	public void set_position(Gtk.PositionType position) {
-		this.position = position;
-
-        // change orientation according to position
-        switch(position) {
-        case Gtk.PositionType.TOP:
-        case Gtk.PositionType.BOTTOM:
-            orientation = Gtk.Orientation.HORIZONTAL;
-            break;
-        case Gtk.PositionType.LEFT:
-        case Gtk.PositionType.RIGHT:
-            orientation = Gtk.Orientation.VERTICAL;
-            break;
-        }
-
-		// call set_panel_position() on all applets
-		foreach(weak Applet applet in get_applets()) {
-			applet.set_panel_position(position);
 		}
 	}
 
@@ -668,20 +626,212 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         return all_panels;
     }
 
+	public static bool is_id_unique(string id) {
+		foreach(unowned Panel panel in all_panels) {
+			if(panel.id == id) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static Panel add_panel(string id, int pos = -1) {
+		if(!is_id_unique(id)) // this is not possible
+			return null;
+		Panel panel = new Panel();
+		panel.id = id;
+		all_panels.insert(panel, pos);
+		panel.show();
+		panel.realize();
+		panel.update_geometry();
+		return panel;
+	}
+
+	public static void reorder_panel(Panel panel, int new_pos) {
+		panel.ref();
+		all_panels.remove(panel);
+		all_panels.insert(panel, new_pos);
+		panel.unref();
+	}
+
 	public unowned string? get_id() {
 		return id;
 	}
+	public void set_id(string id){
+        this.id = id;
+    }
+
+
+	public Gtk.PositionType get_position() {
+		return position;
+	}
+	public void set_position(Gtk.PositionType position, bool force = false) {
+        if(this.position != position || force) {
+            this.position = position;
+
+            // change orientation according to position
+            switch(position) {
+            case Gtk.PositionType.TOP:
+            case Gtk.PositionType.BOTTOM:
+                orientation = Gtk.Orientation.HORIZONTAL;
+                break;
+            case Gtk.PositionType.LEFT:
+            case Gtk.PositionType.RIGHT:
+                orientation = Gtk.Orientation.VERTICAL;
+                break;
+            }
+
+            // call set_panel_position() on all applets
+            foreach(weak Applet applet in get_applets()) {
+                applet.set_panel_position(position);
+            }
+            update_geometry();
+        }
+	}
+
+    public int get_left_margin(){
+        return left_margin;
+    }
+    public void set_left_margin(int left_margin){
+        if(this.left_margin != left_margin) {
+            this.left_margin = left_margin;
+            update_geometry();
+        }
+    }
+
+    public int get_top_margin(){
+        return top_margin;
+    }
+    public void set_top_margin(int top_margin){
+        if(this.top_margin != top_margin) {
+            this.top_margin = top_margin;
+            update_geometry();
+        }
+    }
+
+    public int get_right_margin(){
+        return right_margin;
+    }
+    public void set_right_margin(int right_margin){
+        if(this.right_margin != right_margin) {
+            this.right_margin = right_margin;
+            update_geometry();
+        }
+    }
+
+    public int get_bottom_margin(){
+        return bottom_margin;
+    }
+    public void set_bottom_margin(int bottom_margin){
+        if(this.bottom_margin != bottom_margin) {
+            this.bottom_margin = bottom_margin;
+            update_geometry();
+        }
+    }
+
+	public bool get_span_monitors(){
+        return span_monitors;
+    }
+	public void set_span_monitors(bool span_monitors){
+        if(this.span_monitors != span_monitors) {
+            this.span_monitors = span_monitors;
+            update_geometry();
+        }
+    }
+
+	public int get_thickness(){
+        return thickness;
+    }
+	public void set_thickness(int thickness){
+        if(this.thickness != thickness) {
+            this.thickness = thickness;
+            update_geometry();
+        }
+    }
+
+    public int get_length(){
+        return length;
+    }
+    public void set_length(int length){
+        if(this.length != length) {
+            this.length = length;
+            update_geometry();
+        }
+    }
+
+    public SizeMode get_length_mode(){
+        return length_mode;
+    }
+    public void set_length_mode(SizeMode length_mode){
+        if(this.length_mode != length_mode) {
+            this.length_mode = length_mode;
+            update_geometry();
+        }
+    }
+
+    public double get_alignment(){
+        return alignment;
+    }
+    public void set_alignment(double alignment){
+        if(this.alignment != alignment) {
+            this.alignment = alignment;
+            update_geometry();
+        }
+    }
+
+    public int get_screen_num(){
+        return screen_num;
+    }
+    public void set_screen_num(int screen_num){
+        this.screen_num = screen_num;
+    }
+
+	public int get_monitor(){
+        return monitor;
+    }
+    public void set_monitor(int monitor) {
+        if(this.monitor != monitor) {
+            this.monitor = monitor;
+            update_geometry();
+        }
+    }
+
+	public bool get_auto_hide(){
+        return auto_hide;
+    }
+	public void set_auto_hide(bool auto_hide){
+        if(this.auto_hide != auto_hide) {
+            this.auto_hide = auto_hide;
+        }
+    }
+
+	public bool get_reserve_space(){
+        return reserve_space;
+    }
+	public void set_reserve_space(bool reserve_space){
+        if(this.reserve_space != reserve_space) {
+            this.reserve_space = reserve_space;
+            if(reserve_space) {
+                reserve_screen_space(get_window(), position, old_rect);
+            }
+            else {
+                reserve_screen_space(get_window(), position, null);
+            }
+        }
+    }
 
 	public int get_icon_size() {
 		return icon_size;
 	}
-
 	public void set_icon_size(int size) {
-		foreach(weak Applet applet in get_applets()) {
-			applet.set_icon_size(size);
-		}
+        if(icon_size != size) {
+            foreach(weak Applet applet in get_applets()) {
+                applet.set_icon_size(size);
+            }
+        }
 	}
 
+    // static methods
 	public static unowned string? get_file_manager() {
 		return file_manager;
 	}
@@ -712,6 +862,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     // GUI stuff
 	private Gtk.Box box; // top box used to group applets
     private Gdk.Rectangle old_rect; // rectangle caching the on-screen position & size of the panel.
+    private Gtk.Dialog? pref_dlg; // preference dialog
 
 	// global settings
 	private static string? file_manager; // command used to launch file manager
@@ -719,10 +870,6 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	private static string? theme_name; // name of the theme used
 	private static Gtk.CssProvider? theme_css_provider; // css provider of the selected theme
 	public static List<Panel> all_panels;
-
-    // may be deprecated
-	private string? text_color; // text color
-	private string? font_desc; // font used for text display
 
 }
 

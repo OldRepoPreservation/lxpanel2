@@ -38,9 +38,7 @@ VALAFLAGS = \
 # EggWrapBox from libegg
 LIBEGG_SOURCES = \
 	egg/eggwrapbox.c \
-	egg/eggwrapbox.h \
 	egg/eggwrapbox-enums.c \
-	egg/eggwrapbox-enums.h \
 	$(NULL)
 
 # later we should make applet development related

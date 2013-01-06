@@ -5,7 +5,6 @@ uidir=$(datadir)/lxpanel2/ui
 ui_DATA= \
 	about.ui \
 	preferences.ui \
-	panel-preferences.ui \
 	add-applet.ui \
 	$(NULL)
 

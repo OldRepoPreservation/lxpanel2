@@ -27,7 +27,7 @@ public class SysTrayApplet : Applet {
         frame = new Gtk.Frame("");
         frame.show();
         frame.set_shadow_type(Gtk.ShadowType.NONE);
-        pack_start(frame, false, true, 0);
+        add(frame);
 	}
 
     protected override void parent_set(Gtk.Widget? old_parent) {

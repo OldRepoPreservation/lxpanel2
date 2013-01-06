@@ -28,7 +28,7 @@ public class ShowDesktopApplet : Applet {
 		button.set_tooltip_text(_("Show Desktop"));
         button.clicked.connect(button_clicked);
         button.show();
-        pack_start(button, false, true, 0);
+        add(button);
 	}
 
     protected override void set_icon_size(int size) {
@@ -54,6 +54,7 @@ public class ShowDesktopApplet : Applet {
         applet_info.type_id = typeof(ShowDesktopApplet);
 		applet_info.type_name = "showdesktop";
 		applet_info.name= _("Show Desktop");
+		applet_info.icon = new ThemedIcon("user-desktop");
 		applet_info.description= _("Show Desktop");
         return (owned)applet_info;
 	}

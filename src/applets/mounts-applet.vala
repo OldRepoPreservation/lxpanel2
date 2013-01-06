@@ -25,7 +25,7 @@ public class MountsApplet : Applet {
 
 	construct {
         button = new MenuButton();
-        pack_start(button, false, true, 0);
+        add(button);
         button.show();
 
 		menu = new Gtk.Menu();
@@ -245,6 +245,7 @@ public class MountsApplet : Applet {
         applet_info.type_id = typeof(MountsApplet);
 		applet_info.type_name = "mounts";
 		applet_info.name= _("Mounts");
+		applet_info.icon = new ThemedIcon("drive-removable-media");
 		applet_info.description= _("Show mounted volumes");
 		return (owned)applet_info;
 	}

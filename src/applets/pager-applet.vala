@@ -26,10 +26,15 @@ public class PagerApplet : Applet, Gtk.Orientable {
 	construct {
         pager = new Wnck.Pager();
         pager.show();
-        pack_start(pager, false, true, 0);
+
 		n_rows = 1;
 		pager.set_n_rows(1);
 		pager.set_shadow_type(Gtk.ShadowType.NONE);
+
+        // FIXME: after changing an Applet from GtkBox to GtkGrid,
+        // sizing of the pager gets some unresolved problems...
+        pager.expand = false;
+        add(pager);
 	}
 
     protected override void set_panel_orientation(Gtk.Orientation orient) {

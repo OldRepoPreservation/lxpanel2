@@ -127,7 +127,7 @@ public class LaunchbarApplet : Applet {
 		}
 		// btn.set_label(@"$i");
 		if(btn != null)
-			pack_start(btn, false);
+			attach_next_to(btn, null, Gtk.PositionType.RIGHT, 1, 1);
 		return true;
 	}
 
@@ -180,6 +180,7 @@ public class LaunchbarApplet : Applet {
         applet_info.type_id = typeof(LaunchbarApplet);
 		applet_info.type_name = "launchbar";
 		applet_info.name= _("Launch bar");
+		applet_info.icon = new ThemedIcon("system-run");
 		applet_info.description= _("Launch bar");
         return applet_info;
 	}

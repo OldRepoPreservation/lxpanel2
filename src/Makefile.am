@@ -53,15 +53,10 @@ CORE_SOURCES = \
 # NaTray code from gnome-panel, for systray
 NATRAY_SOURCES = \
 	applets/na-tray/na-tray.c \
-	applets/na-tray/na-tray.h \
 	applets/na-tray/na-tray-child.c \
-	applets/na-tray/na-tray-child.h \
 	applets/na-tray/na-tray-manager.c \
-	applets/na-tray/na-tray-manager.h \
 	applets/na-tray/fixedtip.c \
-	applets/na-tray/fixedtip.h \
 	applets/na-tray/na-marshal.c \
-	applets/na-tray/na-marshal.h \
 	$(NULL)
 
 BUILTIN_APPLETS_SOURCES = \

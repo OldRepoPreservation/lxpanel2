@@ -26,7 +26,7 @@ public class PlacesApplet : Applet {
 	construct {
         drawer = new Drawer();
         drawer.show();
-        pack_start(drawer, false, true, 0);
+        add(drawer);
 	}
 
     protected override void set_icon_size(int size) {
@@ -50,6 +50,7 @@ public class PlacesApplet : Applet {
         applet_info.type_id = typeof(PlacesApplet);
 		applet_info.type_name = "places";
 		applet_info.name= _("Places");
+		applet_info.icon = new ThemedIcon("folder");
 		applet_info.description= _("Places");
         return applet_info;
 	}

@@ -1,5 +1,6 @@
 [Applet]
 Name=Battery
+Icon=batterys
 Version=0.1
 Description=Battery Monitor
 Authors=PCMan;

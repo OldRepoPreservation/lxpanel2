@@ -56,7 +56,10 @@ public class WnckTaskListApplet : Applet {
         tasklist.set_button_relief(Gtk.ReliefStyle.NONE);
         tasklist.set_grouping(Wnck.TasklistGroupingType.AUTO_GROUP);
         tasklist.show();
-        pack_start(tasklist, true, true, 0);
+
+        tasklist.expand = true;
+        add(tasklist);
+
         set_expand(true);
     }
 

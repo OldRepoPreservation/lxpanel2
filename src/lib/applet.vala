@@ -25,6 +25,7 @@ public class AppletInfo : Object {
     public Type type_id = 0;
     public string type_name;
     public string? name;
+    public GLib.Icon? icon;
     public string? version;
     public string? description;
     public string[] authors;
@@ -61,6 +62,16 @@ public class AppletInfo : Object {
                 info.module = new AppletModule(applet_id, module_path);
                 info.description = keyfile.get_locale_string("Applet", "Description");
                 try{
+                    var icon_name = keyfile.get_locale_string("Applet", "Icon");
+                    if(icon_name[0] == '/') { // full path
+						var file = GLib.File.new_for_path(icon_name);
+						info.icon = new FileIcon(file);
+					}
+					else { // icon id
+						info.icon = new ThemedIcon(icon_name);
+					}
+                }catch(Error e){};
+                try{
                     info.version = keyfile.get_locale_string("Applet", "Version");
                 }catch(Error e){};
                 try{
@@ -80,7 +91,7 @@ public class AppletInfo : Object {
 }
 
 // Base class for all applets
-public class Applet : Gtk.Box {
+public class Applet : Gtk.Grid {
 
     construct {
     }

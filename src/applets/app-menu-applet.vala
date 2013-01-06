@@ -27,7 +27,7 @@ public class AppMenuApplet : Applet {
         button = new MenuButton();
 		button.set_tooltip_text(_("Applications"));
 		button.set_icon_pixbuf(new Gdk.Pixbuf.from_file("/usr/share/lubuntu/images/lubuntu-logo.png"));
-        pack_start(button, false, true, 0);
+        add(button);
         button.show();
 
 		var menu = new Gtk.Menu();
@@ -101,6 +101,7 @@ public class AppMenuApplet : Applet {
         applet_info.type_id = typeof(AppMenuApplet);
 		applet_info.type_name = "appmenu";
 		applet_info.name= _("AppMenu");
+        applet_info.icon = new ThemedIcon("start-here");
 		applet_info.description= _("Application Menu");
         return (owned)applet_info;
 	}

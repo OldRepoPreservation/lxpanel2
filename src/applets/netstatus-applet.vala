@@ -26,7 +26,7 @@ public class NetstatusApplet : Applet {
 	construct {
         event_box = new Gtk.EventBox();
 		event_box.set_visible_window(false);
-        pack_start(event_box, false, true, 0);
+        add(event_box);
 		image = new Gtk.Image.from_gicon(icon_idle, Gtk.IconSize.MENU);
 		event_box.add(image);
 		show_all();
@@ -135,6 +135,7 @@ public class NetstatusApplet : Applet {
         applet_info.type_id = typeof(NetstatusApplet);
 		applet_info.type_name = "netstatus";
 		applet_info.name= _("Net Status");
+		applet_info.icon = new ThemedIcon("network-wired");
 		applet_info.description= _("Net Status");
         return (owned)applet_info;
 	}

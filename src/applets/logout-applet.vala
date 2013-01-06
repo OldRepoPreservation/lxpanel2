@@ -46,6 +46,7 @@ class LogoutApplet : Applet {
         applet_info.type_id = typeof(LogoutApplet);
 		applet_info.type_name = "logout";
 		applet_info.name= _("Logout Button");
+		applet_info.icon = new ThemedIcon("system-log-out");
 		applet_info.description= _("Logout Button");
         return (owned)applet_info;
 	}
