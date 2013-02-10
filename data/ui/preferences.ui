@@ -32,30 +32,6 @@
       </row>
     </data>
   </object>
-  <object class="GtkAdjustment" id="icon_size_adjustment">
-    <property name="upper">32767</property>
-    <property name="step_increment">1</property>
-  </object>
-  <object class="GtkImage" id="image1">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-add</property>
-  </object>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-remove</property>
-  </object>
-  <object class="GtkImage" id="image3">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-add</property>
-  </object>
-  <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-remove</property>
-  </object>
   <object class="GtkDialog" id="dialog">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -137,7 +113,7 @@
                 </child>
                 <child>
                   <object class="GtkScrolledWindow" id="scrolledwindow2">
-                    <property name="width_request">100</property>
+                    <property name="width_request">128</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
@@ -146,6 +122,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="headers_visible">False</property>
+                        <property name="reorderable">True</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="treeview-selection1"/>
                         </child>
@@ -153,7 +130,9 @@
                           <object class="GtkTreeViewColumn" id="treeviewcolumn1">
                             <property name="title" translatable="yes">Panels</property>
                             <child>
-                              <object class="GtkCellRendererText" id="cellrenderertext5"/>
+                              <object class="GtkCellRendererText" id="panel_cellrenderertext">
+                                <property name="editable">True</property>
+                              </object>
                               <attributes>
                                 <attribute name="text">0</attribute>
                               </attributes>
@@ -1432,6 +1411,30 @@
       <action-widget response="-7">close_btn</action-widget>
       <action-widget response="0">about_btn</action-widget>
     </action-widgets>
+  </object>
+  <object class="GtkAdjustment" id="icon_size_adjustment">
+    <property name="upper">32767</property>
+    <property name="step_increment">1</property>
+  </object>
+  <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-add</property>
+  </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-remove</property>
+  </object>
+  <object class="GtkImage" id="image3">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-add</property>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-remove</property>
   </object>
   <object class="GtkAdjustment" id="left_margin_adjustment">
     <property name="upper">100</property>

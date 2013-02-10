@@ -858,6 +858,20 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		}
 	}
 
+    /*
+    // Notify that config is changed, so we can write the config file
+    // laster when appropriate.
+    public static void set_config_changed() {
+        if(!config_changed) {
+            config_changed = true;
+            if(pref_dlg != null) {
+            }
+            else {
+            }
+        }
+    }
+    */
+
 	// panel-specific settings
 	private string? id; // id of the panel
 	private Gtk.Orientation _orientation = Gtk.Orientation.HORIZONTAL; // orientation of the panel
@@ -894,6 +908,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	private static Gtk.CssProvider? theme_css_provider; // css provider of the selected theme
 	public static List<Panel> all_panels;
 
+    private bool config_changed = false;
 }
 
 }

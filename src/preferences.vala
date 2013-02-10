@@ -72,12 +72,45 @@ class PreferencesDialog : Gtk.Dialog {
         panel_view_sel = panel_view.get_selection();
         panel_view_sel.set_mode(Gtk.SelectionMode.BROWSE);
         panel_view_sel.changed.connect(on_panel_view_sel_changed);
+        panel_view.button_press_event.connect((view, evt) => {
+            if(evt.button == 3) { // right click
+                panel_view_popup.popup(null, null, null, 3, evt.time);
+                return true;
+            }
+            return false;
+        });
 
         Gtk.TreeIter iter;
         foreach(unowned Panel panel in Panel.get_all()) {
             panel_store.append(out iter);
             panel_store.set(iter, 0, panel.get_id(), 1, panel, -1);
         }
+
+        panel_view_popup = (Gtk.Menu)builder.get_object("panel_view_popup");
+        panel_view_popup.attach_to_widget(panel_view, null);
+        var menuitem = (Gtk.MenuItem)builder.get_object("add_panel_menuitem");
+        menuitem.activate.connect(on_add_panel);
+        menuitem = (Gtk.MenuItem)builder.get_object("remove_panel_menuitem");
+        menuitem.activate.connect(on_remove_panel);
+        menuitem = (Gtk.MenuItem)builder.get_object("rename_panel_menuitem");
+        menuitem.activate.connect(on_rename_panel);
+
+        var render = (Gtk.CellRendererText)builder.get_object("panel_cellrenderertext");
+        render.edited.connect((renderer, path_str, new_str) => {
+            if(current_panel != null && new_str != "") {
+                foreach(unowned Panel panel in Panel.get_all()) {
+                    if(panel.get_id() == new_str) {
+                        return; // name already exists
+                    }
+                }
+                var tree_path = new Gtk.TreePath.from_string(path_str);
+                Gtk.TreeIter sel_iter;
+                if(panel_store.get_iter(out sel_iter, tree_path)) {
+                    panel_store.set(sel_iter, 0, new_str, -1);
+                    current_panel.set_id(new_str);
+                }
+            }
+        });
     }
 
     private void setup_position_page(Gtk.Builder builder) {
@@ -308,7 +341,9 @@ class PreferencesDialog : Gtk.Dialog {
 
     protected override void response(int response_id) {
         if(response_id != 0) {
-            // FIXME: save config here.
+            // save config here.
+            // profile_name is defined in lxpanel2.vala
+            Panel.save_all_panels(Lxpanel.profile_name);
             destroy();
             pref_dlg = null;
         }
@@ -582,8 +617,8 @@ class PreferencesDialog : Gtk.Dialog {
 		return new_id;
 	}
 
-    // [Add Panel] button is clicked
-    private void on_add_panel(Gtk.Button btn) {
+    // [Add Panel] button or popup menu item is clicked
+    private void on_add_panel(Gtk.Widget btn_or_menu) {
 		// FIXME: ask the user to input a new name for the panel
 		string panel_id = ask_for_panel_id(_("New Panel"));
 		Gtk.TreeIter iter;
@@ -600,8 +635,22 @@ class PreferencesDialog : Gtk.Dialog {
 		}
     }
 
-    // [Remove Panel] button is clicked
-    private void on_remove_panel(Gtk.Button btn) {
+    // [Rename Panel] button or popup menu item is clicked
+    private void on_rename_panel(Gtk.Widget btn_or_menu) {
+        Gtk.TreeIter iter;
+        if(panel_view_sel.get_selected(null, out iter)) {
+            Panel panel = null;
+            panel_store.get(iter, 1, out panel, -1);
+            string panel_id = ask_for_panel_id(panel.get_id());
+            if(panel_id != null) {
+                panel.set_id(panel_id);
+                panel_store.set(iter, 0, panel_id, -1);
+            }
+        }
+    }
+
+    // [Remove Panel] button or popup menu item is clicked
+    private void on_remove_panel(Gtk.Widget btn_or_menu) {
 		if(panel_store.iter_n_children(null) > 1) {
 			Gtk.TreeIter iter;
 			if(panel_view_sel.get_selected(null, out iter)) {
@@ -678,6 +727,7 @@ class PreferencesDialog : Gtk.Dialog {
     unowned Gtk.TreeView panel_view;
     unowned Gtk.TreeSelection panel_view_sel;
     Gtk.ListStore panel_store;
+    unowned Gtk.Menu panel_view_popup;
 
     unowned Gtk.TreeView applet_view;
     unowned Gtk.TreeSelection applet_view_sel;
