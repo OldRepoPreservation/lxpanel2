@@ -41,7 +41,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 		box.show();
 		add(box);
 
-        old_rect.x = old_rect.y = old_rect.width = old_rect.height = 0;
+        old_configure_rect.x = old_configure_rect.y = old_configure_rect.width = old_configure_rect.height = 0;
 
 		set_border_width(0); // should we use 1 and paint a 3D border instead?
 		// set_app_paintable(true);
@@ -141,45 +141,17 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	}
 
 	protected override void get_preferred_height(out int min, out int natural) {
-		if(_orientation == Gtk.Orientation.VERTICAL) {
-            switch(length_mode) {
-            case SizeMode.AUTO:
-				base.get_preferred_height(out min, out natural);
-                break;
-            case SizeMode.PIXEL:
-                min = natural = length;
-                break;
-            case SizeMode.PERCENT:
-                // we set this to 100 arbitrarily since we'll set_size_request()
-                // on it according to screen size later in update_geometry()
-				min = natural = 100;
-                break;
-			}
-		}
-		else {
-			min = natural = thickness;
-		}
+        if(preferred_height == -1)
+            base.get_preferred_height(out min, out natural);
+        else
+            min = natural = preferred_height;
 	}
 
 	protected override void get_preferred_width(out int min, out int natural) {
-		if(_orientation == Gtk.Orientation.HORIZONTAL) {
-            switch(length_mode) {
-            case SizeMode.AUTO:
-				base.get_preferred_width(out min, out natural);
-                break;
-            case SizeMode.PIXEL:
-                min = natural = length;
-                break;
-            case SizeMode.PERCENT:
-                // we set this to 100 arbitrarily since we'll set_size_request()
-                // on it according to screen size later in update_geometry()
-				min = natural = 100;
-                break;
-			}
-		}
-		else {
-			min = natural = thickness;
-		}
+        if(preferred_width == -1)
+            base.get_preferred_width(out min, out natural);
+        else
+            min = natural = preferred_width;
 	}
 
     // when the window is really created by X11
@@ -187,21 +159,25 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         base.realize();
     }
 
-    // when the size or position of the panel window is changed.
+    // when the size or position of the panel X11 window is changed.
     protected override bool configure_event(Gdk.EventConfigure event) {
+        // print("configure %s: %d, %d, %d, %d\n", id, event.x, event.y, event.width, event.height);
         var ret = base.configure_event(event);
-        if(old_rect.x != event.x || old_rect.y != event.y || old_rect.width != event.width || old_rect.height != event.height) {
-            old_rect.x = event.x;
-            old_rect.y = event.y;
-            old_rect.width = event.width;
-            old_rect.height = event.height;
-            // when receiving a "configure-event" signal, the position and
-            // size of the window is changed, so it's the right time to update
-            // the space we ask the window manager to reserve for us.
-            if(reserve_space) {
-                // this takes some X roundtrip and is very expansive.
-                // do it only when the new size is really different.
-                reserve_screen_space(get_window(), position, old_rect);
+        // when receiving a "configure-event" signal, the position and
+        // size of the underlying X window is changed, so it's the right
+        // time to update the space we ask the window manager to reserve
+        // for us.
+        if(reserve_space) {
+            // this takes some X roundtrips and is very expansive.
+            // do it only when the new size is really different.
+            if(old_configure_rect.x != event.x || old_configure_rect.y != event.y ||
+                old_configure_rect.width != event.width || old_configure_rect.height != event.height) {
+                // store the current configure size.
+                old_configure_rect.x = event.x;
+                old_configure_rect.y = event.y;
+                old_configure_rect.width = event.width;
+                old_configure_rect.height = event.height;
+                reserve_screen_space(get_window(), position, old_configure_rect);
             }
         }
         return ret;
@@ -209,13 +185,20 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
     // when size of the panel allocated by gtk+ is changed.
 	protected override void size_allocate(Gtk.Allocation allocation) {
+        // print("allocation %s: %d, %d, %d, %d\n", id, allocation.x, allocation.y, allocation.width, allocation.height);
 		base.size_allocate(allocation);
-        Gdk.Rectangle alloc_rect = (Gdk.Rectangle)allocation;
-        // print("alloc_rect %s: %d, %d, %d, %d\n", id, alloc_rect.x, alloc_rect.y, alloc_rect.width, alloc_rect.height);
-        // we only reposition the panel if its size is really changed
-        if(alloc_rect.width != old_rect.width || alloc_rect.height != old_rect.height) {
-            if(length_mode == SizeMode.AUTO)
+        // in auto mode, the panel size is determined by gtk and we need
+        // to reposition the panel when its size is changed.
+        if(length_mode == SizeMode.AUTO) {
+            // stupid gtk+ frequently emit duplicated "size-allocate"
+            // signals even when the size is not changed at all.
+            // so, we only reposition the panel if its size is really changed
+            if(old_allocated_width != allocation.width ||
+                old_allocated_height != allocation.height) {
+                old_allocated_width = allocation.width;
+                old_allocated_height = allocation.height;
                 update_geometry(); // reposition the panel
+            }
         }
 	}
 
@@ -421,6 +404,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
     // resize and reposition the panel according to current monitor size.
 	public void update_geometry() {
+        print("update_geometry(%s)\n", id);
         // If length_mode is SizeMode.AUTO, the length of the panel is
         // determined by gtk so we don't touch it here. We only calculate
         // a new position for it and reposition the panel.
@@ -448,9 +432,8 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         monitor_rect.width -= (left_margin + right_margin);
         monitor_rect.height -= (top_margin + bottom_margin);
 
+        preferred_width = preferred_height = -1; // clear cached size
 		int x = 0, y = 0, width = 0, height = 0;
-        // FIXME: supports alignment
-
         if(orientation == Gtk.Orientation.HORIZONTAL) {
             height = thickness;
             if(length_mode == SizeMode.PERCENT)
@@ -479,10 +462,14 @@ public class Panel : Gtk.Window, Gtk.Orientable {
             else
                 x = monitor_rect.x;
         }
-        if(length_mode != SizeMode.AUTO)
-            set_size_request(width, height);
+        if(length_mode != SizeMode.AUTO) {
+            // when length_mode is percent or pixel, we cache the caculated size.
+            preferred_width = width;
+            preferred_height = height;
+            queue_resize(); // ask gtk+ to resize our panel
+        }
 		move(x, y); // reposition the panel
-        // print("%s: %d, %d, %d, %d, %d, %d\n", id, x, y, width, height, length, length_mode);
+        print("%s: %d, %d, %d, %d, %d, %d\n", id, x, y, width, height, length, length_mode);
 	}
 
 	// for Gtk.Orientable iface
@@ -525,6 +512,8 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 				file_manager = child.val;
 			else if(child.name == "logout_command")
 				logout_command = child.val;
+			else if(child.name == "terminal_command")
+				terminal_command = child.val;
 			else if(child.name == "theme")
 				theme_name = child.val;
 		}
@@ -765,7 +754,12 @@ public class Panel : Gtk.Window, Gtk.Orientable {
     public void set_length_mode(SizeMode length_mode){
         if(this.length_mode != length_mode) {
             this.length_mode = length_mode;
+            // NOTE: clear cached allocated size. otherwise
+            // size_allocate() will be ignored.
+            old_allocated_width = old_allocated_height = -1;
             update_geometry();
+            if(length_mode == SizeMode.AUTO)
+                queue_resize();
         }
     }
 
@@ -812,7 +806,7 @@ public class Panel : Gtk.Window, Gtk.Orientable {
         if(this.reserve_space != reserve_space) {
             this.reserve_space = reserve_space;
             if(reserve_space) {
-                reserve_screen_space(get_window(), position, old_rect);
+                reserve_screen_space(get_window(), position, old_configure_rect);
             }
             else {
                 reserve_screen_space(get_window(), position, null);
@@ -832,12 +826,36 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 	}
 
     // static methods
+
 	public static unowned string? get_file_manager() {
 		return file_manager;
+	}
+	public static void set_file_manager(string? file_manager) {
+		Panel.file_manager = file_manager;
 	}
 
 	public static unowned string? get_logout_command() {
 		return logout_command;
+	}
+	public static void set_logout_command(string logout_command) {
+		Panel.logout_command = logout_command;
+	}
+
+	public static unowned string? get_terminal_command() {
+		return terminal_command;
+	}
+	public static void set_terminal_command(string terminal_command) {
+		Panel.terminal_command = terminal_command;
+	}
+
+	public static unowned string? get_theme_name() {
+		return theme_name;
+	}
+	public static void set_theme_name(string theme_name) {
+		if(Panel.theme_name != theme_name) {
+			Panel.theme_name = theme_name;
+			load_theme(); // load the theme
+		}
 	}
 
 	// panel-specific settings
@@ -861,12 +879,17 @@ public class Panel : Gtk.Window, Gtk.Orientable {
 
     // GUI stuff
 	private Gtk.Box box; // top box used to group applets
-    private Gdk.Rectangle old_rect; // rectangle caching the on-screen position & size of the panel.
+    int preferred_width = -1; // preferred width calculated in update_geometry()
+    int preferred_height = -1; // preferred height calculated in update_geometry()
+    int old_allocated_width = -1; // old width assigned in size_allocate()
+    int old_allocated_height = -1; // old height assigned in size_allocate()
+    private Gdk.Rectangle old_configure_rect; // rectangle caching the on-screen position & size of the panel.
     private Gtk.Dialog? pref_dlg; // preference dialog
 
 	// global settings
 	private static string? file_manager; // command used to launch file manager
 	private static string? logout_command; // command used to logout desktop session
+	private static string? terminal_command; // command used to lauch a terminal emulator
 	private static string? theme_name; // name of the theme used
 	private static Gtk.CssProvider? theme_css_provider; // css provider of the selected theme
 	public static List<Panel> all_panels;

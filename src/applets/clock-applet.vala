@@ -8,6 +8,7 @@ public class ClockApplet : Applet {
 
 	construct {
         label = new Gtk.Label("");
+		label.set_vexpand(true);
         add(label);
         label.show();
 		timeout = Timeout.add(1000, on_timeout);

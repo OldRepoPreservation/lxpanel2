@@ -121,22 +121,7 @@ class PreferencesDialog : Gtk.Dialog {
         });
 
         monitor_combo = (Gtk.ComboBox)builder.get_object("monitor_combo");
-        monitor_combo.set_row_separator_func((model, iter) => {
-            string name = null;
-            model.get(iter, 0, out name, -1);
-            if(name == null)
-                return true;
-            return false;
-        });
-        monitor_combo.changed.connect((combo) => {
-            if(current_panel != null) {
-                int monitor = combo.get_active();
-                current_panel.set_monitor(monitor);
-            }
-        });
         var monitor_model = (Gtk.ListStore)monitor_combo.get_model();
-        Gtk.TreeIter sep_it;
-        monitor_model.append(out sep_it);
         var screen = get_screen();
         var n_monitors = screen.get_n_monitors();
         int i;
@@ -145,8 +130,23 @@ class PreferencesDialog : Gtk.Dialog {
             string name = @"Monitor $i: $plug_name";
             monitor_model.insert_with_values(null, -1, 0, name, -1);
         }
+        monitor_combo.changed.connect((combo) => {
+            if(current_panel != null) {
+                int monitor = combo.get_active();
+                current_panel.set_monitor(monitor);
+            }
+        });
+        monitor_combo.set_sensitive(!current_panel.get_span_monitors());
+
+        span_monitors_check = (Gtk.ToggleButton)builder.get_object("span_monitors_check");
+        span_monitors_check.toggled.connect((btn) => {
+            var toggled = btn.get_active();
+            if(current_panel != null)
+                current_panel.set_span_monitors(toggled);
+            monitor_combo.set_sensitive(!toggled);
+        });
     }
-    
+
     private void setup_size_page(Gtk.Builder builder) {
         length_spin = (Gtk.SpinButton)builder.get_object("length_spin");
         length_spin.value_changed.connect((spin) => {
@@ -239,12 +239,71 @@ class PreferencesDialog : Gtk.Dialog {
         min_size_spin = (Gtk.SpinButton)builder.get_object("min_size_spin");
     }
 
+	private void setup_themes(Gtk.Builder builder) {
+		// setup theme combobox
+		theme_combo = (Gtk.ComboBox)builder.get_object("theme_combo");
+		// load themes
+
+		/*
+		// search for the user specific themes first
+		var theme_dir = Path.build_filename(Environment.get_home_dir(), ".theme", theme_name, "lxpanel", null);
+		if(FileUtils.test(theme_dir + "/lxpanel.css", FileTest.IS_REGULAR))
+			return theme_dir;
+		// try system-wide theme dirs
+		var data_dirs = Environment.get_system_data_dirs();
+		foreach(unowned string data_dir in data_dirs) {
+			theme_dir = Path.build_filename(data_dir, "themes", theme_name, "lxpanel", null);
+			if(FileUtils.test(theme_dir + "/lxpanel.css", FileTest.IS_REGULAR))
+				return theme_dir;
+		}
+		*/
+		theme_combo.changed.connect((combo) => {
+			Gtk.TreeIter iter;
+			
+		});
+
+		use_theme_radio = (Gtk.RadioButton)builder.get_object("use_theme_radio");
+		use_theme_radio.toggled.connect((btn) => {
+		});
+
+		no_theme_radio = (Gtk.RadioButton)builder.get_object("no_theme_radio");
+		no_theme_radio.toggled.connect((btn) => {
+			var no_theme = btn.get_active();
+			theme_combo.set_sensitive(!no_theme);
+		});
+	}
+
     private void setup_global_page(Gtk.Builder builder) {
+
+		setup_themes(builder);
+
+		// custom commands
         file_manager_entry = (Gtk.Entry)builder.get_object("file_manager_entry");
-        // file_manager_entry.set_text(Panel.file_manager);
+        var cmd = Panel.get_file_manager();
+        if(cmd != null)
+			file_manager_entry.set_text(cmd);
+        file_manager_entry.changed.connect((editable) => {
+			var entry = (Gtk.Entry)editable;
+			Panel.set_file_manager(entry.get_text());
+		});
 
         terminal_entry = (Gtk.Entry)builder.get_object("terminal_entry");
+        cmd = Panel.get_terminal_command();
+        if(cmd != null)
+			terminal_entry.set_text(cmd);
+        terminal_entry.changed.connect((editable) => {
+			var entry = (Gtk.Entry)editable;
+			Panel.set_terminal_command(entry.get_text());
+		});
+
         logout_entry = (Gtk.Entry)builder.get_object("logout_entry");
+        cmd = Panel.get_logout_command();
+        if(cmd != null)
+			logout_entry.set_text(cmd);
+        logout_entry.changed.connect((editable) => {
+			var entry = (Gtk.Entry)editable;
+			Panel.set_logout_command(entry.get_text());
+		});
     }
 
     protected override void response(int response_id) {
@@ -408,7 +467,8 @@ class PreferencesDialog : Gtk.Dialog {
         top_margin_spin.set_value(panel.get_top_margin());
         right_margin_spin.set_value(panel.get_right_margin());
         bottom_margin_spin.set_value(panel.get_bottom_margin());
-        // monitor_combo.set_active();
+        monitor_combo.set_active(panel.get_monitor());
+        span_monitors_check.set_active(panel.get_span_monitors());
 
         // [Size] page
         length_spin.set_value(panel.get_length());
@@ -633,6 +693,7 @@ class PreferencesDialog : Gtk.Dialog {
     unowned Gtk.SpinButton right_margin_spin;
     unowned Gtk.SpinButton bottom_margin_spin;
     unowned Gtk.ComboBox monitor_combo;
+    unowned Gtk.ToggleButton span_monitors_check;
 
     unowned Gtk.SpinButton length_spin;
     unowned Gtk.ComboBox length_unit_combo;
@@ -644,6 +705,9 @@ class PreferencesDialog : Gtk.Dialog {
     unowned Gtk.ToggleButton autohide_check;
     unowned Gtk.SpinButton min_size_spin;
 
+	unowned Gtk.ComboBox theme_combo;
+	unowned Gtk.RadioButton use_theme_radio;
+	unowned Gtk.RadioButton no_theme_radio;
     unowned Gtk.Entry file_manager_entry;
     unowned Gtk.Entry terminal_entry;
     unowned Gtk.Entry logout_entry;

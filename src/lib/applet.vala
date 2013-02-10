@@ -199,6 +199,10 @@ public class Applet : Gtk.Grid {
         return true;
     }
 
+//    protected override Gtk.SizeRequestMode get_request_mode() {
+//        return Gtk.SizeRequestMode.CONSTANT_SIZE;
+//    }
+
     public unowned AppletInfo get_info() {
         return applet_info;
     }

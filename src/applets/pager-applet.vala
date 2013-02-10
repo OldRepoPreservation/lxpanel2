@@ -21,18 +21,53 @@
 
 namespace Lxpanel {
 
+// FIXME: after changing an Applet from GtkBox to GtkGrid,
+// sizing of the pager gets some unresolved problems...
+// When orientation is horizontal, Wnck.Pager set its height to 48 by default.
+// Its width is determined by get_preferred_width_for_height().
+// gtk_widget_set_size_request() can no longer shrink a widget after gtk3.
+// To force a widget to be smaller, we need to override its 
+// get_preferred_width/height() methods and returned smaller values.
+
+private class Pager : Wnck.Pager {
+
+    public Pager(PagerApplet parent) {
+        this.parent = parent;
+    }
+
+	public override void get_preferred_height(out int min_h, out int natral_h) {
+		if(parent.orientation == Gtk.Orientation.HORIZONTAL) {
+			min_h = natral_h = parent.get_icon_size();
+		}
+        else {
+			base.get_preferred_height(out min_h, out natral_h);
+        }
+	}
+
+	public override void get_preferred_width(out int min_w, out int natral_w) {
+		if(parent.orientation == Gtk.Orientation.VERTICAL) {
+			min_w = natral_w = parent.get_icon_size();
+		}
+		else {
+			base.get_preferred_width(out min_w, out natral_w);
+		}
+	}
+
+    private unowned PagerApplet parent;
+}
+
+
 public class PagerApplet : Applet, Gtk.Orientable {
 
 	construct {
-        pager = new Wnck.Pager();
+        pager = new Pager(this);
         pager.show();
 
 		n_rows = 1;
 		pager.set_n_rows(1);
 		pager.set_shadow_type(Gtk.ShadowType.NONE);
 
-        // FIXME: after changing an Applet from GtkBox to GtkGrid,
-        // sizing of the pager gets some unresolved problems...
+		expand = false;
         pager.expand = false;
         add(pager);
 	}
@@ -43,32 +78,9 @@ public class PagerApplet : Applet, Gtk.Orientable {
     }
 
     protected override void set_icon_size(int size) {
-        // FIXME: is this correct?
         base.set_icon_size(size);
-		set_size_request(size, size);
+        queue_resize();
     }
-
-	public override void get_preferred_height(out int min_h, out int natral_h) {
-		if(orientation == Gtk.Orientation.HORIZONTAL) {
-			min_h = 1;
-			natral_h = get_icon_size();
-		}
-		else {
-			base.get_preferred_width(out min_h, out natral_h);
-		}
-		debug("get_preferred_height: %d, %d", min_h, natral_h);
-	}
-
-	public override void get_preferred_width(out int min_w, out int natral_w) {
-		if(orientation == Gtk.Orientation.VERTICAL) {
-			min_w = 1;
-			natral_w = get_icon_size();
-		}
-		else {
-			base.get_preferred_width(out min_w, out natral_w);
-		}
-		debug("get_preferred_width: %d, %d", min_w, natral_w);
-	}
 
 	// for Gtk.Orientable iface
 	public Gtk.Orientation orientation {
