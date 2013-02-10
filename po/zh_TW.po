@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-08-12 17:09+0800\n"
+"POT-Creation-Date: 2013-02-10 18:17+0800\n"
 "PO-Revision-Date: 2011-12-03 09:30+0800\n"
 "Last-Translator: Hong Jen Yee (PCMan) <pcman.tw@gmail.com>\n"
 "Language-Team: zh_TW <pcman.tw@gmail.com>\n"
@@ -23,14 +23,366 @@ msgid "profile name"
 msgstr ""
 
 #. var app = new Gtk.Application("org.lxde.Lxpanel", 0);
-#: ../src/lxpanel2.vala:82
+#: ../src/lxpanel2.vala:129
 msgid "- lightweight desktop panel"
 msgstr ""
 
+#: ../src/preferences.vala:592
+msgid "Panel Name"
+msgstr ""
+
+#. FIXME: ask the user to input a new name for the panel
+#: ../src/preferences.vala:623
+msgid "New Panel"
+msgstr ""
+
+#: ../src/preferences.vala:663
+msgid "You should have at least one panel"
+msgstr ""
+
+#: ../src/lib/applet.vala:356
+msgid "_Add New Applet"
+msgstr ""
+
+#: ../src/lib/applet.vala:356
+msgid "Add new applet to the panel"
+msgstr ""
+
+#: ../src/lib/applet.vala:357
+msgid "Remove the applet to the panel"
+msgstr ""
+
+#: ../src/lib/applet.vala:358
+msgid "Properties of the applet to the panel"
+msgstr ""
+
+#: ../src/lib/applet.vala:359 ../data/ui/preferences.ui.h:5
+msgid "Panel Preferences"
+msgstr ""
+
+#: ../src/applets/app-menu-applet.vala:28
+msgid "Applications"
+msgstr ""
+
+#: ../src/applets/app-menu-applet.vala:103
+msgid "AppMenu"
+msgstr ""
+
+#: ../src/applets/app-menu-applet.vala:105
+msgid "Application Menu"
+msgstr ""
+
+#: ../src/applets/blank-applet.vala:101
+msgid "Blank"
+msgstr ""
+
+#: ../src/applets/blank-applet.vala:102
+msgid "Blank space"
+msgstr ""
+
+#: ../src/applets/clock-applet.vala:50 ../src/applets/clock-applet.vala:51
+msgid "Clock"
+msgstr ""
+
+#: ../src/applets/launchbar-applet.vala:182
+#: ../src/applets/launchbar-applet.vala:184
+msgid "Launch bar"
+msgstr ""
+
+#: ../src/applets/logout-applet.vala:28
+msgid "Logout"
+msgstr ""
+
+#: ../src/applets/logout-applet.vala:48 ../src/applets/logout-applet.vala:50
+msgid "Logout Button"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:33
+msgid "Mounted Volumes"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:134
+msgid "Open"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:141
+msgid "Unmount"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:145
+msgid "Mount"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:152
+msgid "Eject"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:247
+msgid "Mounts"
+msgstr ""
+
+#: ../src/applets/mounts-applet.vala:249
+msgid "Show mounted volumes"
+msgstr ""
+
+#: ../src/applets/netstatus-applet.vala:137
+#: ../src/applets/netstatus-applet.vala:139
+msgid "Net Status"
+msgstr ""
+
+#: ../src/applets/pager-applet.vala:115 ../src/applets/pager-applet.vala:116
+msgid "Pager"
+msgstr ""
+
+#: ../src/applets/places-applet.vala:52 ../src/applets/places-applet.vala:54
+msgid "Places"
+msgstr ""
+
+#: ../src/applets/show-desktop-applet.vala:28
+#: ../src/applets/show-desktop-applet.vala:56
+#: ../src/applets/show-desktop-applet.vala:58
+msgid "Show Desktop"
+msgstr ""
+
+#: ../src/applets/systray-applet.vala:84 ../src/applets/systray-applet.vala:85
+msgid "System Tray"
+msgstr ""
+
+#: ../src/applets/wnck-task-list-applet.vala:94
+#: ../src/applets/wnck-task-list-applet.vala:95
+msgid "Tasklist"
+msgstr ""
+
 #: ../data/ui/about.ui.h:1
-msgid "Copyright (C) 2011 by PCMan"
+msgid "Copyright (C) 2012"
 msgstr ""
 
 #: ../data/ui/about.ui.h:2
-msgid "Building GTK+ programs with CMake.\t"
+msgid "Lightweight Desktop Panel"
+msgstr ""
+
+#: ../data/ui/about.ui.h:3
+msgid "http://lxde.org/"
+msgstr ""
+
+#. Please replace this line with your own names, one name per line.
+#: ../data/ui/about.ui.h:5
+msgid "translator-credits"
+msgstr ""
+
+#: ../data/ui/add-applet.ui.h:1
+msgid "Add applets to the panel"
+msgstr ""
+
+#: ../data/ui/add-applet.ui.h:2
+msgid "Select one from the available applet list and add it to the panel."
+msgstr ""
+
+#: ../data/ui/add-applet.ui.h:3
+msgid "Name"
+msgstr ""
+
+#: ../data/ui/add-applet.ui.h:4
+msgid "Description"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:1
+msgid "Left"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:2
+msgid "Right"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:3
+msgid "Top"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:4
+msgid "Bottom"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:6
+msgid "Panels"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:7
+msgid "Add a new panel"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:8
+msgid "Remove panel"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:9
+msgid "<b>Position</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:10
+msgid "Screen edge:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:11
+msgid "Alignment:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:12
+msgid "(0.0 - 1.0)"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:13
+msgid "<b>Margin</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:14
+msgid "Left:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:15
+msgid "Top:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:16
+msgid "Right:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:17
+msgid "bottom:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:18
+msgid "<b>Monitor</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:19
+msgid "Show on monitor:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:20
+msgid "Span across all monitors"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:21
+msgid "Position"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:22
+msgid "<b>Size</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:23
+msgid "Length:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:24
+msgid "Thickness:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:25
+msgid "Icon size:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:26
+msgid "pixels"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:27
+msgid "Size"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:28
+msgid "You can use \"drag and drop\" to reorder applets in the  list."
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:29
+msgid "column"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:30
+msgid "Add Applet"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:31
+msgid "Applets"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:32
+msgid "<b>Properties</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:33
+msgid "Make window managers treat the panel as dock"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:34
+msgid "Reserve space, and not covered by maximized windows"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:35
+msgid "<b>Automatic hiding</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:36
+msgid "Minimize panel when not in use"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:37
+msgid "Size when minimized"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:38
+msgid "Advanced"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:39
+msgid "<b>Theme</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:40
+msgid "Use theme:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:41
+msgid "Disable theming and use system theme"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:42
+msgid "<b>Preferred Applications</b>"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:43
+msgid "File manager:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:44
+msgid "Terminal emulator:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:45
+msgid "Logout command:"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:46
+msgid "Global"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:47
+msgid "automatic"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:49
+#, no-c-format
+msgid "% percent"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:50
+msgid "Add Panel"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:51
+msgid "Rename Panel"
+msgstr ""
+
+#: ../data/ui/preferences.ui.h:52
+msgid "Remove Panel"
 msgstr ""

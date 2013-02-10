@@ -121,11 +121,10 @@ private void register_builtin_applets() {
 
 public int main(string[] args) {
 
-    /*
-    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
-    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-    textdomain (GETTEXT_PACKAGE);
-    */
+    Intl.bindtextdomain(Config.GETTEXT_PACKAGE, Config.PACKAGE_LOCALE_DIR);
+    Intl.bind_textdomain_codeset(Config.GETTEXT_PACKAGE, "UTF-8");
+    Intl.textdomain(Config.GETTEXT_PACKAGE);
+
 	// var app = new Gtk.Application("org.lxde.Lxpanel", 0);
 	Gtk.init_with_args(ref args, _("- lightweight desktop panel"), option_entries, Config.GETTEXT_PACKAGE);
 	// var screen = Wnck.Screen.get_default();

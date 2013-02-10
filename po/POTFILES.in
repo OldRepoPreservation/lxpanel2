@@ -1,5 +1,40 @@
 # files listed here will be processed by intltool to generate a pot file.
-src/lxpanel2.vala
-src/panel.vala
-[type: gettext/glade] data/ui/about.ui
 
+# main program
+src/add-applet.vala
+src/lxpanel2.vala
+src/panel-manager.vala
+src/panel.vala
+src/preferences.vala
+src/settings.vala
+
+# liblxpanel-applet
+src/lib/applet.vala
+src/lib/button.vala
+src/lib/drawer.vala
+src/lib/gmarkup-dom.vala
+src/lib/grid.vala
+src/lib/menu-button.vala
+src/lib/module.vala
+src/lib/popup.vala
+src/lib/upower.vala
+src/lib/utils.vala
+
+# applets
+src/applets/app-menu-applet.vala
+src/applets/blank-applet.vala
+src/applets/clock-applet.vala
+src/applets/launchbar-applet.vala
+src/applets/logout-applet.vala
+src/applets/mounts-applet.vala
+src/applets/netstatus-applet.vala
+src/applets/pager-applet.vala
+src/applets/places-applet.vala
+src/applets/show-desktop-applet.vala
+src/applets/systray-applet.vala
+src/applets/wnck-task-list-applet.vala
+
+# ui files
+[type: gettext/glade] data/ui/about.ui
+[type: gettext/glade] data/ui/add-applet.ui
+[type: gettext/glade] data/ui/preferences.ui

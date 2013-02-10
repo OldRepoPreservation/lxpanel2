@@ -32,6 +32,10 @@
       </row>
     </data>
   </object>
+  <object class="GtkAdjustment" id="icon_size_adjustment">
+    <property name="upper">32767</property>
+    <property name="step_increment">1</property>
+  </object>
   <object class="GtkDialog" id="dialog">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -901,7 +905,6 @@
                             <child>
                               <object class="GtkButton" id="move_up_btn">
                                 <property name="label">gtk-go-up</property>
-                                <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="use_stock">True</property>
@@ -915,7 +918,6 @@
                             <child>
                               <object class="GtkButton" id="move_down_btn">
                                 <property name="label">gtk-go-down</property>
-                                <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="use_stock">True</property>
@@ -1188,6 +1190,7 @@
                         <child>
                           <object class="GtkGrid" id="grid5">
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">False</property>
                             <property name="margin_left">12</property>
                             <property name="row_spacing">6</property>
@@ -1411,10 +1414,6 @@
       <action-widget response="-7">close_btn</action-widget>
       <action-widget response="0">about_btn</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkAdjustment" id="icon_size_adjustment">
-    <property name="upper">32767</property>
-    <property name="step_increment">1</property>
   </object>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
